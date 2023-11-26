@@ -12,7 +12,6 @@ app.use(cors())
 app.use('/api/v1', router)
 
 
-
 app.get('*', (req, res) => {
     return res.status(404).json({
         error: 'End point is not registered'
