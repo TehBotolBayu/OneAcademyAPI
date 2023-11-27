@@ -116,6 +116,7 @@ model Courses{
 
 model Materials{
   id String @id @default(uuid())
+  step Int
   title String
   videoURL String
   duration String
@@ -124,7 +125,20 @@ model Materials{
   updatedAt DateTime @updatedAt
 
   courseId String
+  chapterId String
   course Courses @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  chapter Chapters @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+}
+
+model Chapters{
+  id String @id @default(uuid())
+  totalDuration Int
+  step Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  material Materials[]
 }
 
 model Images{
