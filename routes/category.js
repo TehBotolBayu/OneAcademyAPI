@@ -1,6 +1,6 @@
 const express = require("express"),
     router = express.Router(),
-    controller = require('../controllers/category.controller')
+    controller = require('../controllers/category.controller'),
     multerLib = require('multer')();
 
 
