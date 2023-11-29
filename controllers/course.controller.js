@@ -26,7 +26,9 @@ module.exports = {
     },
     getAllCourses: async (req, res) =>{
         try {
-            const courses = Courses.findMany()
+            const courses = Courses.findMany({
+                take: 10
+            })
 
             res.status(200).json({
                 courses
