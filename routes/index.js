@@ -1,10 +1,9 @@
 const express = require("express"),
   router = express.Router(),
   categoryRouter = require("./category"),
-  coursesRouter = require("./course");
+  courseRouter = require("./courses");
 
 router.use("/category", categoryRouter);
-
-router.use("/course", coursesRouter);
+router.use("/course", courseRouter);
 
 module.exports = router;
