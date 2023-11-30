@@ -43,7 +43,7 @@ module.exports = {
                 }
             })
 
-            res.locals.image = image;
+            res.locals.data = image;
             next();   
         } catch (error) {
             console.log(error.message);
@@ -53,12 +53,28 @@ module.exports = {
         }
     },
 
-    updateImage: async (req, res, next) => {
+    updateImage: async (req, res) => {
         try {
+            const course = res.locals.data;
+            
+            const imageId = course.imageId;
+
+            const imageData = await Images.findUnique({
+                where: {
+                    id: imageId
+                }
+            })
+
             let stringFile = undefined;
             if(req.file) stringFile = req.file.buffer.toString('base64');
 
             if(stringFile){
+                const deletedFile = await imageKit.deleteFile(imageData.metadata.fileId, (err, res) => {
+                    if(err){
+                        throw err;
+                    }
+                })
+
                 const uploadFile = await imageKit.upload({
                     fileName: Date.now() + '-' + req.file.originalname,
                     file: stringFile
@@ -71,16 +87,16 @@ module.exports = {
                         metadata: uploadFile
                     },
                     where: {
-                        id: req.params.imageId
+                        id: imageId
                     }
-
                 })
                 
-                res.locals.image = image;
-                next();
+                
             }
 
-            next();
+            return res.status(201).json({
+              course
+            });            
         } catch (error) {
             console.log(error.message);
             return res.status(400).json({
@@ -91,17 +107,20 @@ module.exports = {
 
     deleteImage: async (req, res, next) => {
         try {
-            const content = res.locals.image;
-
-            const deletedFile = await imageKit.deleteFile(content.imageId, (err, res) => {
-                if(err){
-                    throw err;
-                }
-            })
+            const {data, image} = res.locals.data;
+            // console.log(image);
+            let deletedFile;
+            if(image){
+                deletedFile = await imageKit.deleteFile(image.metadata.fileId, (err, res) => {
+                    if(err){
+                        throw err;
+                    }
+                })
+            }
             
             return res.status(400).json({
                 status: "deleted",
-                data: content,
+                data: data,
                 metadata: deletedFile
             })
         } catch (error) {

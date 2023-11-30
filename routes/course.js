@@ -6,13 +6,14 @@ const express = require("express"),
 
 router.post("/create", multerLib.single('image'), imageController.create, courseController.create);
 router.put(
-  "/update",
-  imageController.updateImage,
-  courseController.updateCourse
+  "/update/:courseId",
+  multerLib.single('image'),
+  courseController.updateCourse,
+  imageController.updateImage
 );
 router.get("/", courseController.getAllCourses);
-router.get("/courseId", courseController.getCourseById);
-router.delete("/delete/courseId", courseController.deleteCourse);
+router.get("/:courseId", courseController.getCourseById);
+router.delete("/delete/:courseId",  courseController.deleteCourse, imageController.deleteImage);
 
 // SEARCH
 router.get("/search/:query", courseController.search);

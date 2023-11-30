@@ -22,10 +22,10 @@ module.exports = {
         },
       });
 
-      res.json(courses);
+      return res.json(courses);
     } catch (error) {
       console.log(error);
-      res.status(500).json({ error: "Something went wrong" });
+      return res.status(500).json({ error: "Something went wrong" });
     }
   },
 
@@ -48,28 +48,30 @@ module.exports = {
             }
           }
       });
-      res.status(200).json({
+      return res.status(201).json({
         course,
       });
     } catch (error) {
       console.log(error);
-      res.status(400).json({ error: error.message });
+      return res.status(400).json({ error: error.message });
     }
   },
+
   getAllCourses: async (req, res) => {
     try {
       const courses = await Courses.findMany({
         take: 10,
       });
 
-      res.status(200).json({
+      return res.status(201).json({
         courses,
       });
     } catch (error) {
       console.log(error);
-      res.status(400).json({ error: error.message });
+      return res.status(400).json({ error: error.message });
     }
   },
+
   getCourseById: async (req, res) => {
     try {
       const course = await Courses.findUnique({
@@ -78,40 +80,42 @@ module.exports = {
         },
       });
 
-      res.status(200).json({
-        course,
+      if(!course){
+        return res.status(404).json({
+          message: "data not found"
+        });
+        
+      }
+
+      return res.status(201).json({
+        course
       });
     } catch (error) {
       console.log(error);
-      res.status(400).json({ error: error.message });
+      return res.status(400).json({ error: error.message });
     }
   },
-  updateCourse: async (req, res) => {
+  updateCourse: async (req, res, next) => {
     try {
-      // if(!req.locals.image){
-      //     req.locals.image = undefined
-      // }
       const course = await Courses.update({
         data: {
           title: req.body.title,
           instructor: req.body.instructor,
           courseType: req.body.courseType,
           level: req.body.level,
-          price: req.body.price,
-          description: req.body.description,
-          imageId: res.locals.image,
-          categoryId: req.body.categoryId,
+          price: parseFloat(req.body.price),
+          description: req.body.description
         },
         where: {
           id: req.params.courseId,
         },
       });
-      res.status(200).json({
-        course,
-      });
+
+      res.locals.data = course;
+      next();
     } catch (error) {
       console.log(error);
-      res.status(400).json({ error: error.message });
+      return res.status(400).json({ error: error.message });
     }
   },
   deleteCourse: async (req, res, next) => {
@@ -122,17 +126,19 @@ module.exports = {
         },
       });
 
-      const image = Images.findUnique({
+      const image = await Images.findUnique({
         where: {
           id: course.imageId,
         },
       });
 
-      res.locals.image = image;
+      const data = course;
+
+      res.locals.data = {data, image};
       next();
     } catch (error) {
       console.log(error);
-      res.status(400).json({ error: error.message });
+      return res.status(400).json({ error: error.message });
     }
   },
 };
