@@ -1,4 +1,5 @@
 const { Images } = require("../models");
+const {imageKit}  = require("../utils");
 
 module.exports = {
     create: async (req, res, next) => {
@@ -7,9 +8,9 @@ module.exports = {
             if(req.file) stringFile = req.file.buffer.toString('base64');
 
             if(stringFile){
-                const uploadFile = await imageApi.upload({
+                const uploadFile = await imageKit.upload({
                     fileName: Date.now() + '-' + req.file.originalname,
-                    file: stringFile
+                    file: stringFile,
                 })
 
                 const image = await Images.create({
@@ -20,8 +21,9 @@ module.exports = {
                     }
                 })
 
-                res.locals.image = image;
+                res.locals.data = image;
                 next();
+                return;
             }
 
             throw new Error("failed to upload image");
@@ -57,7 +59,7 @@ module.exports = {
             if(req.file) stringFile = req.file.buffer.toString('base64');
 
             if(stringFile){
-                const uploadFile = await imageApi.upload({
+                const uploadFile = await imageKit.upload({
                     fileName: Date.now() + '-' + req.file.originalname,
                     file: stringFile
                 })
@@ -91,7 +93,7 @@ module.exports = {
         try {
             const content = res.locals.image;
 
-            const deletedFile = await imageApi.deleteFile(content.imageId, (err, res) => {
+            const deletedFile = await imageKit.deleteFile(content.imageId, (err, res) => {
                 if(err){
                     throw err;
                 }

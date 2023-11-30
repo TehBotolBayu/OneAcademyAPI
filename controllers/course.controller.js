@@ -1,5 +1,4 @@
 const { Courses, Images } = require("../models");
-const { imageKit } = require("../utils");
 
 module.exports = {
   search: async (req, res) => {
@@ -29,31 +28,37 @@ module.exports = {
       res.status(500).json({ error: "Something went wrong" });
     }
   },
+
   create: async (req, res) => {
     try {
-      const course = Courses.create({
-        data: {
-          title: req.body.title,
-          instructor: req.body.instructor,
-          courseType: req.body.courseType,
-          level: req.body.level,
-          price: req.body.price,
-          description: req.body.description,
-          imageId: res.locals.image,
-          categoryId: req.body.categoryId,
-        },
+      console.log(res.locals.data.id)
+      const course = await Courses.create({
+          data: {
+            title: req.body.title,
+            instructor: req.body.instructor,
+            courseType: req.body.courseType,
+            level: req.body.level,
+            price: parseFloat(req.body.price),
+            description: req.body.description,
+            image: {
+              connect: {id: res.locals.data.id}
+            },
+            category: {
+              connect: {id: req.body.categoryId}
+            }
+          }
       });
-
       res.status(200).json({
         course,
       });
     } catch (error) {
+      console.log(error);
       res.status(400).json({ error: error.message });
     }
   },
   getAllCourses: async (req, res) => {
     try {
-      const courses = Courses.findMany({
+      const courses = await Courses.findMany({
         take: 10,
       });
 
@@ -61,12 +66,13 @@ module.exports = {
         courses,
       });
     } catch (error) {
+      console.log(error);
       res.status(400).json({ error: error.message });
     }
   },
   getCourseById: async (req, res) => {
     try {
-      const course = Courses.findUnique({
+      const course = await Courses.findUnique({
         where: {
           id: req.params.courseId,
         },
@@ -76,6 +82,7 @@ module.exports = {
         course,
       });
     } catch (error) {
+      console.log(error);
       res.status(400).json({ error: error.message });
     }
   },
@@ -84,7 +91,7 @@ module.exports = {
       // if(!req.locals.image){
       //     req.locals.image = undefined
       // }
-      const course = Courses.update({
+      const course = await Courses.update({
         data: {
           title: req.body.title,
           instructor: req.body.instructor,
@@ -103,12 +110,13 @@ module.exports = {
         course,
       });
     } catch (error) {
+      console.log(error);
       res.status(400).json({ error: error.message });
     }
   },
   deleteCourse: async (req, res, next) => {
     try {
-      const course = Courses.delete({
+      const course = await Courses.delete({
         where: {
           id: req.params.courseId,
         },
@@ -123,6 +131,7 @@ module.exports = {
       res.locals.image = image;
       next();
     } catch (error) {
+      console.log(error);
       res.status(400).json({ error: error.message });
     }
   },

@@ -4,7 +4,7 @@ const express = require("express"),
   imageController = require("../controllers/image.controller"),
   multerLib = require("multer")();
 
-router.post("/create", imageController.create, courseController.create);
+router.post("/create", multerLib.single('image'), imageController.create, courseController.create);
 router.put(
   "/update",
   imageController.updateImage,
