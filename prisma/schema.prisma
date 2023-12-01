@@ -111,7 +111,7 @@ model Materials {
   step      Int
   title     String
   videoURL  String
-  duration  String
+  duration  Int
   status    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
