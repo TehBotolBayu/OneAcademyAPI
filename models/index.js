@@ -11,5 +11,6 @@ module.exports = {
     Categories: prisma.Categories,
     Courses: prisma.Courses,
     Materials: prisma.Materials,
-    Images: prisma.Images  
+    Chapters: prisma.Chapters,
+    Images: prisma.Images
 }

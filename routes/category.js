@@ -6,7 +6,7 @@ const express = require("express"),
 
 router.post("/create",  multerLib.single('image'), controller.create);
 router.put("/:id",multerLib.single('image'), controller.update);
-router.get("/showAll", controller.showAllCategory);
+router.get("/", controller.showAllCategory);
 router.get("/:id", controller.getCategoryById);
 router.delete("/:id", controller.destroy);
 

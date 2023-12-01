@@ -13,7 +13,7 @@ router.put(
 );
 router.get("/", courseController.getAllCourses);
 router.get("/:courseId", courseController.getCourseById);
-router.delete("/delete/:courseId",  courseController.deleteCourse, imageController.deleteImage);
+router.delete("/:courseId",  courseController.deleteCourse, imageController.deleteImage);
 
 // SEARCH
 router.get("/search/:query", courseController.search);

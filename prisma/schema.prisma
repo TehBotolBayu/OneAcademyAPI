@@ -101,9 +101,9 @@ model Courses {
   categoryId  String?
   image       Images?       @relation(fields: [imageId], references: [id], onDelete: SetNull)
   category    Categories?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  material    Materials[]
   transaction Transactions?
   review      Reviews[]
+  Chapter    Chapters[]
 }
 
 model Materials {
@@ -115,9 +115,7 @@ model Materials {
   status    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  courseId  String
   chapterId String
-  course    Courses  @relation(fields: [courseId], references: [id], onDelete: Cascade)
   chapter   Chapters @relation(fields: [chapterId], references: [id], onDelete: Cascade)
 }
 
@@ -126,9 +124,11 @@ model Chapters {
   totalDuration Int
   step          Int
   title         String
+  courseId      String?
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   material      Materials[]
+  course        Courses?     @relation(fields: [courseId], references: [id], onDelete: Cascade)
 }
 
 model Images {
