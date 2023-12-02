@@ -3,16 +3,15 @@ const { Courses, Images } = require("../models");
 module.exports = {
   search: async (req, res) => {
     try {
-      const { query } = req.params;
-      const queryParam = query;
-
+      const queryParam  = req.query.name;
+      console.log(query);
       const courses = await Courses.findMany({
         where: {
           OR: [
-            { title: { contains: queryParam || "" } },
-            { instructor: { contains: queryParam || "" } },
-            { description: { contains: queryParam || "" } },
-            { level: { contains: queryParam || "" } },
+            { title: { contains: queryParam || "", mode:'insensitive' } },
+            { instructor: { contains: queryParam || "" , mode:'insensitive' } },
+            { description: { contains: queryParam || "" , mode:'insensitive' } },
+            { level: { contains: queryParam || "" , mode:'insensitive' } },
             // Add more fields to search as needed
           ],
         },
@@ -60,7 +59,7 @@ module.exports = {
   getAllCourses: async (req, res) => {
     try {
       const courses = await Courses.findMany({
-        take: 10,
+        take: 10
       });
 
       return res.status(201).json({

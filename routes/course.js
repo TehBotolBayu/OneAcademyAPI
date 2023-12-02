@@ -11,12 +11,12 @@ router.put(
   courseController.updateCourse,
   imageController.updateImage
 );
+router.get("/search", courseController.search);
 router.get("/", courseController.getAllCourses);
 router.get("/:courseId", courseController.getCourseById);
 router.delete("/:courseId",  courseController.deleteCourse, imageController.deleteImage);
 
 // SEARCH
-router.get("/search/:query", courseController.search);
 // localhost:3000/api/v1/course/search/modul
 
 module.exports = router;
