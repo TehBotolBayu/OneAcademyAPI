@@ -1,4 +1,4 @@
-const { Courses, Images } = require("../models");
+const { Courses, Images, Materials, Chapters } = require("../models");
 
 module.exports = {
   search: async (req, res) => {
@@ -12,7 +12,6 @@ module.exports = {
             { instructor: { contains: queryParam || "" , mode:'insensitive' } },
             { description: { contains: queryParam || "" , mode:'insensitive' } },
             { level: { contains: queryParam || "" , mode:'insensitive' } },
-            // Add more fields to search as needed
           ],
         },
         include: {
@@ -114,8 +113,22 @@ module.exports = {
         });
       }
 
+      const materials = await Materials.findMany({
+        where: {
+          courseId: course.id
+        }
+      })
+
+      const chapters = await Chapters.findMany({
+        where: {
+          courseId: course.id
+        }
+      })
+
       return res.status(201).json({
         course,
+        materials,
+        chapters
       });
     } catch (error) {
       console.log(error);

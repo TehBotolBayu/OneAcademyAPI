@@ -5,11 +5,14 @@ module.exports = {
     try {
       const material = await Materials.create({
         data: {
-          step: req.body.step,
+          step: parseInt(req.body.step),
           title: req.body.title,
           videoURL: req.body.videoURL,
-          duration: req.body.duration,
+          duration: parseInt(req.body.duration),
           status: req.body.status,
+          course: {
+            connect: {id: req.body.courseId}
+          },
           chapter: {
             connect: { id: req.body.chapterId },
           },

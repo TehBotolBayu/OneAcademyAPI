@@ -5,8 +5,8 @@ module.exports = {
     try {
       const chapter = await Chapters.create({
         data: {
-          totalDuration: req.body.totalDuration,
-          step: req.body.step,
+          totalDuration: parseInt(req.body.totalDuration),
+          step: parseInt(req.body.step),
           title: req.body.title,
           course: {
             connect: { id: req.body.courseId },
