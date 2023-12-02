@@ -30,22 +30,22 @@ module.exports = {
 
   create: async (req, res) => {
     try {
-      console.log(res.locals.data.id)
+      console.log(res.locals.data.id);
       const course = await Courses.create({
-          data: {
-            title: req.body.title,
-            instructor: req.body.instructor,
-            courseType: req.body.courseType,
-            level: req.body.level,
-            price: parseFloat(req.body.price),
-            description: req.body.description,
-            image: {
-              connect: {id: res.locals.data.id}
-            },
-            category: {
-              connect: {id: req.body.categoryId}
-            }
-          }
+        data: {
+          title: req.body.title,
+          instructor: req.body.instructor,
+          courseType: req.body.courseType,
+          level: req.body.level,
+          price: parseFloat(req.body.price),
+          description: req.body.description,
+          image: {
+            connect: { id: res.locals.data.id },
+          },
+          category: {
+            connect: { id: req.body.categoryId },
+          },
+        },
       });
       return res.status(201).json({
         course,
@@ -57,13 +57,42 @@ module.exports = {
   },
 
   getAllCourses: async (req, res) => {
-    try {
-      const courses = await Courses.findMany({
-        take: 10
-      });
+    const { page, record } = req.query;
 
-      return res.status(201).json({
+    try {
+      const take = parseInt(record, 10) || 10; // Jumlah entitas yang akan diambil per halaman (default: 10)
+      const currentPage = parseInt(page, 10) || 1; // Halaman yang diminta (default: 1)
+
+      const options = {
+        take,
+        skip: (currentPage - 1) * take,
+      };
+
+      const [courses, totalRows] = await Promise.all([
+        Courses.findMany(options),
+        Courses.count(), // Menghitung total baris
+      ]);
+
+      const totalPages = Math.ceil(totalRows / take); // Menghitung total halaman
+
+      // Mendapatkan informasi halaman sebelumnya jika currentPage bukan 1
+      let previousPage = null;
+      if (currentPage > 1) {
+        previousPage = currentPage - 1;
+      }
+
+      // Mendapatkan informasi halaman berikutnya jika tidak ada query page yang diberikan atau currentPage kurang dari totalPages
+      let nextPage = null;
+      if (!page || currentPage < totalPages) {
+        nextPage = currentPage + 1;
+      }
+
+      return res.status(200).json({
         courses,
+        previousPage,
+        nextPage,
+        totalRows,
+        totalPages,
       });
     } catch (error) {
       console.log(error);
@@ -79,15 +108,14 @@ module.exports = {
         },
       });
 
-      if(!course){
+      if (!course) {
         return res.status(404).json({
-          message: "data not found"
+          message: "data not found",
         });
-        
       }
 
       return res.status(201).json({
-        course
+        course,
       });
     } catch (error) {
       console.log(error);
@@ -103,7 +131,7 @@ module.exports = {
           courseType: req.body.courseType,
           level: req.body.level,
           price: parseFloat(req.body.price),
-          description: req.body.description
+          description: req.body.description,
         },
         where: {
           id: req.params.courseId,
@@ -133,7 +161,7 @@ module.exports = {
 
       const data = course;
 
-      res.locals.data = {data, image};
+      res.locals.data = { data, image };
       next();
     } catch (error) {
       console.log(error);
