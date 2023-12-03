@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const express = require('express'),
     app = express(),
     PORT = process.env.PORT || 3000,
@@ -5,12 +7,10 @@ const express = require('express'),
     router = require('./routes')
 
 
-require('dotenv').config()
 app.use(express.json({strict: false}))
 
 app.use(cors())
 app.use('/api/v1', router)
-
 
 
 app.get('*', (req, res) => {
