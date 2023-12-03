@@ -35,7 +35,6 @@ module.exports = {
         include: {
           category: true,
           image: true,
-          transaction: true,
           review: true,
         },
         orderBy: filters.newest,
