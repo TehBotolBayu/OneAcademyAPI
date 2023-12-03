@@ -4,7 +4,7 @@ module.exports = {
   search: async (req, res) => {
     try {
       const queryParam = req.query.name;
-      console.log(query);
+      console.log(queryParam);
       const courses = await Courses.findMany({
         where: {
           OR: [
