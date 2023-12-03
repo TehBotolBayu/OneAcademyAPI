@@ -3,7 +3,7 @@ const { Courses } = require("../models");
 module.exports = {
   filter : async (req, res) => {
     try {
-      const { sortBy, category, level, promo, page, record } = req.query;
+      const { sortBy, category, level, promo, courseType, page, record } = req.query;
       const pageNumber = parseInt(page) || 1;
       const recordPerPageNumber = parseInt(record) || 10;
       const skipNumber = (pageNumber - 1) * recordPerPageNumber;
@@ -29,6 +29,11 @@ module.exports = {
         beginner: { level: "Beginner" },
         intermediate: { level: "Intermediate" },
         advanced: { level: "Advanced" },
+      };
+  
+      const courseTypeFilters = {
+        gratis: { courseType: "Gratis" },
+        premium: { courseType: "Premium" },
       };
   
       let query = {
@@ -57,6 +62,10 @@ module.exports = {
   
       if (promo && filters.promo) {
         query.where = { ...query.where, ...filters.promo };
+      }
+  
+      if (courseType) {
+        query.where = { ...query.where, ...courseTypeFilters[courseType] };
       }
   
       const totalCount = await Courses.count({
