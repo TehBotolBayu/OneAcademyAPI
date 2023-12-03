@@ -9,6 +9,6 @@ router.get("filterCategory", filterController.categoryFilter);
 // localhost:3000/api/v1/filter/filterCategory?category=UI/UX Designer
 
 router.get("filterLevel", filterController.levelFilter);
-//
+// localhost:3000/api/v1/filter/filterLevel?
 
 module.exports = router;
