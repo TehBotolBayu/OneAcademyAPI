@@ -70,7 +70,7 @@ module.exports = {
 
       const filter = filters[category];
 
-      courses = await prisma.courses.findMany({
+      courses = await Courses.findMany({
         where: {
           AND: [
             {
@@ -106,7 +106,7 @@ module.exports = {
       let courses;
 
       if (level) {
-        courses = await prisma.courses.findMany({
+        courses = await Courses.findMany({
           where: {
             level: {
               equals: level.toLowerCase(), // Memastikan level dalam format lowercase di database
@@ -120,7 +120,7 @@ module.exports = {
         });
       } else {
         // Jika tidak ada filter level yang diberikan, kembalikan semua kursus
-        courses = await prisma.courses.findMany({
+        courses = await Courses.findMany({
           include: {
             category: true,
           },
