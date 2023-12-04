@@ -67,6 +67,23 @@ module.exports = {
       const options = {
         take,
         skip: (currentPage - 1) * take,
+        include : {
+          category : {
+            select : {
+              name : true,
+            }
+          },
+          image : {
+            select : {
+              url : true,
+            }
+          },
+          review : {
+            select : {
+              score : true,
+            }
+          }
+        }
       };
 
       const [courses, totalRows] = await Promise.all([
