@@ -63,7 +63,15 @@ module.exports = {
 
   showAllCategory: async (req, res) => {
     try {
-      const category = await Categories.findMany();
+      const category = await Categories.findMany({
+        include: {
+          image : {
+            select : {
+              url : true,
+            }
+          }
+        }
+      });
 
       if (Categories.length === 0) {
         return res.status(404).json({
