@@ -18,7 +18,7 @@ enum Rolename {
 model Roles {
   id   Int      @id @default(autoincrement())
   name Rolename
-  user Users?
+  user Users[]
 }
 
 model Users {
@@ -26,12 +26,12 @@ model Users {
   email       String
   phone       String
   password    String
-  resetToken  String
-  codeOTP     Int
-  OTPlimit    DateTime       @default(now())
+  resetToken  String?
+  codeOTP     Int?
+  OTPlimit    DateTime?
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
-  roleId      Int?           @unique
+  roleId      Int?
   role        Roles?         @relation(fields: [roleId], references: [id], onDelete: SetNull)
   profile     Profiles?
   transaction Transactions[]
@@ -41,8 +41,8 @@ model Users {
 model Profiles {
   id        String   @id @default(uuid())
   name      String
-  country   String
-  city      String
+  country   String?
+  city      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   userId    String   @unique

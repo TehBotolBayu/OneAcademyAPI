@@ -3,7 +3,6 @@ const express = require("express"),
     controller = require('../controllers/category.controller'),
     multerLib = require('multer')();
 
-
 router.post("/create",  multerLib.single('image'), controller.create);
 router.put("/:id",multerLib.single('image'), controller.update);
 router.get("/", controller.showAllCategory);
