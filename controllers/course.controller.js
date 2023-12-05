@@ -17,8 +17,9 @@ module.exports = {
           ],
         },
         include: {
-          category: true, // Include category details if needed
-          image: true, // Include image details if needed
+          category: true,
+          image: true, 
+          review : true
         },
       });
 
