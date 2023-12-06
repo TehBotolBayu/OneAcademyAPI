@@ -9,7 +9,7 @@ module.exports = {
           title: req.body.title,
           videoURL: req.body.videoURL,
           duration: parseInt(req.body.duration),
-          status: req.body.status,
+          status: "Selesai",
           course: {
             connect: {id: req.body.courseId}
           },
