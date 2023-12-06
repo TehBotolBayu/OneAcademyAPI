@@ -130,6 +130,16 @@ module.exports = {
             select : {
               name : true
             }
+          },
+          image : {
+            select : {
+              url : true,
+            }
+          },
+          review : {
+            select : {
+              score : true,
+            }
           }
         }
       });
