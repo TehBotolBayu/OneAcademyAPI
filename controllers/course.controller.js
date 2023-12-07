@@ -125,6 +125,23 @@ module.exports = {
         where: {
           id: req.params.courseId,
         },
+        include : {
+          category : {
+            select : {
+              name : true
+            }
+          },
+          image : {
+            select : {
+              url : true,
+            }
+          },
+          review : {
+            select : {
+              score : true,
+            }
+          }
+        }
       });
 
       if (!course) {
