@@ -1,11 +1,22 @@
-const {Users, Profiles, Roles} = require('../models')
+const {Users, Profiles, Roles} = require('../models');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
+
 
 async function hashPassword(plaintextPassword) {
     const hash = await bcrypt.hash(plaintextPassword, 10);
     return hash;
 }
+
+function generateOTP() {
+    var digits = '0123456789'; 
+    let OTP = ''; 
+    for (let i = 0; i < 6; i++ ) { 
+        OTP += digits[Math.floor(Math.random() * 10)]; 
+    } 
+    return OTP; 
+} 
 
 module.exports = {
     getAllRole: async (req, res) => {
@@ -38,13 +49,18 @@ module.exports = {
 
     register: async (req, res) => {
         try {
+            let date = new Date();
+            date.setMinutes(date.getMinutes() + 5);
+            date.toISOString();
             const hashed = await hashPassword(req.body.password);
-
             const user = await Users.create({
                 data: {
                     email: req.body.email,
                     phone: req.body.phone,
                     password: hashed,
+                    codeOTP: generateOTP(),
+                    OTPlimit: date,
+                    status: "inactive",
                     role: {
                         connect: {id: parseInt(req.body.roleId)}
                     }
@@ -59,13 +75,129 @@ module.exports = {
                     }
                 }
             });
+
+            const transporter = nodemailer.createTransport({
+                host: "smtp.gmail.com",
+                port: 465,
+                secure: true,
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASSWORD
+                }
+            });
+
+            const mailOptions = {
+                from: 'system@gmail.com',
+                to : req.body.email,
+                subject: "Account Verification",
+                html: `<p>Your OTP</p><h1>${user.codeOTP}</h1>`
+            }
+
+            transporter.sendMail(mailOptions, (err) => {
+                if(err) {
+                    console.log(err)
+                    return res.status(400);
+                }
+                return res.status(200).json({
+                    message: "account is created, OTP sent",
+                    user
+                });
+            })
         
-            return res.status(200).json({
-                status: "created",
-                user,
-                profile,
+            
+        } catch (error) {
+            console.log(error.message);
+            return res.status(400).json({
+                error
+            })
+        }
+    },
+
+    verifyOTP: async (req, res) => {
+        try {
+            const acc = await Users.findUnique({
+                where: {
+                    email: req.body.email
+                }
             })
             
+            if(req.body.OTP == acc.codeOTP){
+                let now = new Date().toISOString();
+                if(acc.OTPlimit.toISOString() > now){
+                    await Users.update({
+                        data: {
+                            codeOTP: null,
+                            OTPlimit: null,
+                            status: "active"
+                        },
+                        where: {
+                            email: req.body.email
+                        }
+                    })
+
+                    return res.status(200).json({
+                        message: "Your Account has activated"
+                    })
+                } else {
+                    return res.status(400).json({
+                        message: "Your OTP is expired, try resetting it"
+                    })
+                }
+            } else {
+                return res.status(200).json({
+                    message: "Your OTP is invalid"
+                })
+            }
+        } catch (error) {
+            console.log(error.message);
+            return res.status(400).json({
+                error
+            })
+        }
+    },
+
+    resetOTP: async (req, res) => {
+        try {
+            let date = new Date();
+            date.setMinutes(date.getMinutes() + 5);
+            date.toISOString();
+            const acc = await Users.update({
+                data:{
+                    codeOTP: generateOTP(),
+                    OTPlimit: date
+                },
+                where: {
+                    email: req.body.email
+                }
+            })
+
+            const transporter = nodemailer.createTransport({
+                host: "smtp.gmail.com",
+                port: 465,
+                secure: true,
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASSWORD
+                }
+            });
+
+            const mailOptions = {
+                from: 'system@gmail.com',
+                to : req.body.email,
+                subject: "Account Verification",
+                html: `<p>Your OTP</p><h1>${acc.codeOTP}</h1>`
+            }
+
+            transporter.sendMail(mailOptions, (err) => {
+                if(err) {
+                    console.log(err)
+                    return res.status(400);
+                }
+                return res.status(200).json({
+                    message: "We have sent a new OTP, check your email",
+                });
+            })
+
         } catch (error) {
             console.log(error.message);
             return res.status(400).json({
@@ -86,6 +218,12 @@ module.exports = {
                 return res.status(404).json({
                     error: 'Email tidak terdaftar!'
                 });
+            }
+
+            if(findUser.status === "inactive"){
+                return res.status(401).json({
+                    message: "Account is not activated, please enter OTP"
+                })
             }
         
             if(bcrypt.compareSync(req.body.password, findUser.password)){

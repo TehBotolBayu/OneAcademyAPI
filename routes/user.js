@@ -4,6 +4,8 @@ const express = require('express'),
 
 router.post('/register', controller.register);
 router.post('/login', controller.login);
+router.post('/verify', controller.verifyOTP);
+router.post('/resetOTP', controller.resetOTP);
 
 // router.get('/', userController.getUsers);
 // router.get('/:userId', userController.getUserById, imageKit.imagekitGet);
