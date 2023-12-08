@@ -9,6 +9,11 @@ async function hashPassword(plaintextPassword) {
     return hash;
 }
 
+const cryptPassword = async (password) => {
+    const salt = await bcrypt.genSalt(5);
+    return bcrypt.hash(password, salt)
+}
+
 function generateOTP() {
     var digits = '0123456789'; 
     let OTP = ''; 
@@ -252,5 +257,107 @@ module.exports = {
                 error
             })
         }
-    }
+    },
+
+    resetPassword: async (req, res) => {
+        try {
+            const findUser = await Users.findFirst({
+                where: {
+                    email: req.body.email
+                }
+            });
+
+            if(!findUser) {
+                return res.status(400).json({
+                    message: "User not found"
+                });
+            }
+
+            const encrypt = await cryptPassword(req.body.email);
+
+            await Users.update({
+                data: {
+                    resetToken: encrypt,
+                },
+                where: {
+                    id: findUser.id
+                }
+            });
+
+            const transporter = nodemailer.createTransport({
+                host: "smtp.gmail.com",
+                port: 465,
+                secure: true,
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASSWORD
+                }
+            });
+
+            const mailOptions = {
+                from: 'system@gmail.com',
+                to : req.body.email,
+                subject: "Reset Password",
+                html: `<p>Reset Password </p><a href="localhost:5000/set-password/${encrypt}">Click Here</a><br></br><p>Paste this url to your browser if you cant click link above</p><p>localhost:5000/set-password/${encrypt}</p>`
+            }
+
+            transporter.sendMail(mailOptions, (err) => {
+                if(err) {
+                    console.log(err)
+                    return res.status(400).json({
+                        message: "Something went wrong"
+                    });
+                }
+
+                return res.status(200).json({
+                    message: "email sent"
+                });
+            })
+ 
+            
+            
+        } catch (error) {
+            console.log(error)
+            return res.status(500).json({
+                error
+            });
+        }
+    },
+
+    setPassword: async (req, res) => {
+        try {
+            
+            const findUser = await Users.findFirst({
+                where: {
+                    resetToken: req.body.key
+                }
+            });
+
+            if(!findUser) {
+                return res.status(400).json({
+                    message: "User not found"
+                });
+            }
+
+            await Users.update({
+                data: {
+                    password: await cryptPassword(req.body.password),
+                    resetToken: null
+                },
+                where: {
+                    id: findUser.id
+                }
+            });
+
+            return res.status(200).json({
+                message: "Password has changed"
+            });;
+            
+        } catch (error) {
+            console.log(error)
+            return res.status(500).json({
+                error
+            });
+        }
+    },
 }
