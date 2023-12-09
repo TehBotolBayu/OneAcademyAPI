@@ -23,11 +23,12 @@ model Roles {
 
 model Users {
   id          String         @id @default(uuid())
-  email       String
+  email       String  @unique
   phone       String
   password    String
+  status      String
   resetToken  String?
-  codeOTP     Int?
+  codeOTP     String?
   OTPlimit    DateTime?
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
