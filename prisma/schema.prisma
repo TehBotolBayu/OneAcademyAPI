@@ -55,7 +55,7 @@ model Profiles {
 model Transactions {
   id            String   @id @default(uuid())
   status        String
-  paymentMethod String
+  paymentMethod String?
   totalTax      Float
   totalPrice    Float
   paymentDate   DateTime
