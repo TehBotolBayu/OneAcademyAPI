@@ -3,13 +3,12 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 
-
 async function hashPassword(plaintextPassword) {
     const hash = await bcrypt.hash(plaintextPassword, 10);
     return hash;
 }
 
-const cryptPassword = async (password) => {
+async function cryptPassword(password) {
     const salt = await bcrypt.genSalt(5);
     return bcrypt.hash(password, salt)
 }
@@ -313,8 +312,6 @@ module.exports = {
                     message: "email sent"
                 });
             })
- 
-            
             
         } catch (error) {
             console.log(error)
@@ -351,7 +348,7 @@ module.exports = {
 
             return res.status(200).json({
                 message: "Password has changed"
-            });;
+            });
             
         } catch (error) {
             console.log(error)
@@ -360,4 +357,58 @@ module.exports = {
             });
         }
     },
+
+    update: async (req, res) => {
+        try {
+            const user = await Users.update({
+                data: {
+                    email: req.body.email,
+                    phone: req.body.phone
+                },
+                where: {
+                    id: req.params.userId
+                }
+            })
+            const profile = await Profiles.update({
+                data: {
+                    name: req.body.name,
+                    country: req.body.country,
+                    city: req.body.city,
+                    image: {
+                        connect: {id: res.locals.data.id}
+                    } 
+                },
+                where: {
+                    userId: req.params.userId
+                }
+            })
+
+            return res.status(201).json({
+                message: "updated",
+                user,
+                profile
+            })
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({ error: "Something went wrong" });
+        }
+    },
+
+    delete: async (req, res) => {
+        try {
+            const user = await Users.delete({
+                where: {
+                    id: req.params.userId
+                }
+            })
+
+            return res.status(201).json({
+                message: "deleted",
+                user
+            })
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({ error: "Something went wrong" });
+        }
+    }
 }
