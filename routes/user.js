@@ -4,7 +4,10 @@ const express = require('express'),
 
 router.post('/register', controller.register);
 router.post('/login', controller.login);
-
+router.post('/verify', controller.verifyOTP);
+router.post('/resetOTP', controller.resetOTP);
+router.post('/reset-password', controller.resetPassword);
+router.post('/set-password', controller.setPassword);
 // router.get('/', userController.getUsers);
 // router.get('/:userId', userController.getUserById, imageKit.imagekitGet);
 // router.delete('/delete/:userId', auth.checkToken, userController.deleteUser, imageKit.imagekitDelete);
