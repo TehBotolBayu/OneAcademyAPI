@@ -95,7 +95,7 @@ module.exports = {
         to: req.body.email,
         subject: "Account Verification",
         // html: `<p>Your OTP</p><h1>${user.codeOTP}</h1>`,
-        html : `<div
+        html: `<div
         style="
             text-align: center;
             padding: 1rem;
@@ -143,7 +143,7 @@ module.exports = {
             >Thank you for choosing OneAcademy!<br />
             © 2023, One Academy. All rights reserved.</small
         >
-    </div>`
+    </div>`,
       };
 
       transporter.sendMail(mailOptions, (err) => {
@@ -220,9 +220,9 @@ module.exports = {
         where: {
           email: req.body.email,
         },
-        include : {
-            profile : true
-        }
+        include: {
+          profile: true,
+        },
       });
 
       const transporter = nodemailer.createTransport({
@@ -363,8 +363,8 @@ module.exports = {
           email: req.body.email,
         },
         include: {
-            profile : true
-        }
+          profile: true,
+        },
       });
 
       if (!findUser) {
@@ -399,7 +399,7 @@ module.exports = {
         to: req.body.email,
         subject: "Reset Password",
         // html: `<p>Reset Password </p><a href="localhost:5000/set-password/${encrypt}">Click Here</a><br></br><p>Paste this url to your browser if you cant click link above</p><p>localhost:5000/set-password/${encrypt}</p>`,
-        html : `<div
+        html: `<div
         style="
             text-align: center;
             padding: 1rem;
@@ -457,7 +457,7 @@ module.exports = {
             >Thank you for choosing OneAcademy!<br />
             © 2023, One Academy. All rights reserved.</small
         >
-    </div>`
+    </div>`,
       };
 
       transporter.sendMail(mailOptions, (err) => {
