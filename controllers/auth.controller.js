@@ -394,6 +394,23 @@ module.exports = {
         }
     },
 
+    getProfile: async (req,res) => {
+        try {
+            const profile = await Profiles.findUnique({
+                where: {
+                    userId: req.params.userId
+                }
+            })
+
+            return res.status(201).json({
+                profile
+            })
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({ error: "Something went wrong" });
+        }
+    },
+    
     delete: async (req, res) => {
         try {
             const user = await Users.delete({
