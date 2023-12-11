@@ -6,7 +6,8 @@ const express = require("express"),
   materialRouter = require("./material"),
   filterRouter = require("./filter"),
   userRouter = require("./user"),
-  transactionRouter = require("./transaction");
+  transactionRouter = require("./transaction"),
+  myClassRouter = require("./myClass");
 
 router.use("/category", categoryRouter);
 router.use("/course", courseRouter);
@@ -15,5 +16,6 @@ router.use("/material", materialRouter);
 router.use("/filter", filterRouter);
 router.use("/user", userRouter);
 router.use("/transaction", transactionRouter);
+router.use("/myClass", myClassRouter);
 
 module.exports = router;
