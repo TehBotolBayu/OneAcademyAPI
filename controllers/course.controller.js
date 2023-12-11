@@ -1,4 +1,4 @@
-const { Courses, Images, Materials, Chapters } = require("../models");
+const { Courses, Images, Materials, Chapters,Transactions } = require("../models");
 
 module.exports = {
   search: async (req, res) => {
@@ -121,6 +121,7 @@ module.exports = {
 
   getCourseById: async (req, res) => {
     try {
+      // const userId = res.locals.userId;
       const course = await Courses.findUnique({
         where: {
           id: req.params.courseId,
@@ -149,6 +150,26 @@ module.exports = {
           message: "data not found",
         });
       }
+
+       // Ambil data transaksi berdasarkan courseId dan userId (misalnya dari session atau token)
+    // const transaction = await Transactions.findUnique({
+    //   where: {
+    //     courseId: courseId,
+    //     userId: userId,
+    //   },
+    // });
+
+    // let canJoinCourse = false;
+    // let paymentStatus = "Belum Bayar";
+    // if (transaction) {
+    //   // Jika transaksi ditemukan, periksa status pembayaran
+    //   if (transaction.status === "Sudah Bayar") {
+    //     canJoinCourse = true;
+    //     paymentStatus = "Sudah Bayar";
+    //   } else {
+    //     paymentStatus = "Belum Bayar";
+    //   }
+    // }
 
       const chapters = await Chapters.findMany({
         where: {
