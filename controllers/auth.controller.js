@@ -97,53 +97,59 @@ module.exports = {
         // html: `<p>Your OTP</p><h1>${user.codeOTP}</h1>`,
         html: `<div
         style="
-            text-align: center;
-            padding: 1rem;
-            border-radius: 5px;
-            background-color: #6148ff;
-            color: white;
-            font-family: 'Montserrat', Tahoma, Geneva, Verdana, sans-serif;
+          text-align: center;
+          padding: 1rem;
+          border-radius: 5px;
+          background-color: #6148ff;
+          color: white;
+          font-family: 'Montserrat', Tahoma, Geneva, Verdana, sans-serif;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column;
+          min-height: 80dvh;
         "
-    >
+      >
         <h1>Activation Account</h1>
         <img
-            src="https://i.imgur.com/tpY1Mr8.png"
-            alt="One Academy"
-            style="margin-bottom: 1.5rem"
+          src="https://i.imgur.com/tpY1Mr8.png"
+          alt="One Academy"
+          style="width: 55dvw"
         />
         <div
-            style="
-                background-color: white;
-                border-radius: 10px;
-                padding: 1rem;
-                margin-bottom: 10px;
-                color: black;
-            "
+          style="
+            background-color: white;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 20px;
+            color: black;
+            max-width: 70dvw;
+            max-height: 50dvh;
+            margin-top: 10px;
+          "
         >
-            <p>
-                Hello <span style="font-weight: 700">${profile.name},</span>
-            </p>
-
-            <p>
-                Thank you for choosing to join OneAcademy!<br />
-                Your account activation is almost complete. To finalize the
-                activation process, please Enter the OTP below :
-            </p>
-
-            <p style="letter-spacing: 5px; font-size: 25px">
-                <strong>${user.codeOTP}</strong>
-            </p>
-            <p>
-                Your account will be successfully activated upon completion
-                of these steps. If you did not initiate this action or have
-                any concerns, please contact our support team immediately
-            </p>
+          <p>Hello <span style="font-weight: 700">${profile.name},</span></p>
+  
+          <p>
+            Thank you for choosing to join OneAcademy!<br />
+            Your account activation is almost complete. To finalize the activation
+            process, please Enter the OTP below :
+          </p>
+  
+          <p style="letter-spacing: 5px; font-size: 25px">
+            <strong>${user.codeOTP}</strong>
+          </p>
+          <p>
+            Your account will be successfully activated upon completion of these
+            steps. If you did not initiate this action or have any concerns,
+            please contact our support team immediately
+          </p>
         </div>
-        <small
-            >Thank you for choosing OneAcademy!<br />
-            © 2023, One Academy. All rights reserved.</small
-        >
-    </div>`,
+        <p>
+          Thank you for choosing OneAcademy!<br />
+          © 2023, One Academy. All rights reserved.
+        </p>
+      </div>`,
       };
 
       transporter.sendMail(mailOptions, (err) => {
@@ -240,54 +246,60 @@ module.exports = {
         to: req.body.email,
         subject: "Account Verification",
         html: `<div
-                style="
-                    text-align: center;
-                    padding: 1rem;
-                    border-radius: 5px;
-                    background-color: #6148ff;
-                    color: white;
-                    font-family: 'Montserrat', Tahoma, Geneva, Verdana, sans-serif;
-                "
+            style="
+              text-align: center;
+              padding: 1rem;
+              border-radius: 5px;
+              background-color: #6148ff;
+              color: white;
+              font-family: 'Montserrat', Tahoma, Geneva, Verdana, sans-serif;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              flex-direction: column;
+              min-height: 80dvh;
+            "
+          >
+            <h1>Activation Account</h1>
+            <img
+              src="https://i.imgur.com/tpY1Mr8.png"
+              alt="One Academy"
+              style="width: 55dvw"
+            />
+            <div
+              style="
+                background-color: white;
+                border-radius: 10px;
+                padding: 1rem;
+                margin-bottom: 20px;
+                color: black;
+                max-width: 70dvw;
+                max-height: 50dvh;
+                margin-top: 10px;
+              "
             >
-                <h1>Activation Account</h1>
-                <img
-                    src="https://i.imgur.com/tpY1Mr8.png"
-                    alt="One Academy"
-                    style="margin-bottom: 1.5rem"
-                />
-                <div
-                    style="
-                        background-color: white;
-                        border-radius: 10px;
-                        padding: 1rem;
-                        margin-bottom: 10px;
-                        color: black;
-                    "
-                >
-                    <p>
-                        Hello <span style="font-weight: 700">${acc.profile.name},</span>
-                    </p>
-    
-                    <p>
-                        Thank you for choosing to join OneAcademy!<br />
-                        Your account activation is almost complete. To finalize the
-                        activation process, please Enter the OTP below :
-                    </p>
-    
-                    <p style="letter-spacing: 5px; font-size: 25px">
-                        <strong>${acc.codeOTP}</strong>
-                    </p>
-                    <p>
-                        Your account will be successfully activated upon completion
-                        of these steps. If you did not initiate this action or have
-                        any concerns, please contact our support team immediately
-                    </p>
-                </div>
-                <small
-                    >Thank you for choosing OneAcademy!<br />
-                    © 2023, One Academy. All rights reserved.</small
-                >
-            </div>`,
+              <p>Hello <span style="font-weight: 700">${acc.profile.name},</span></p>
+      
+              <p>
+                Thank you for choosing to join OneAcademy!<br />
+                Your account activation is almost complete. To finalize the activation
+                process, please Enter the OTP below :
+              </p>
+      
+              <p style="letter-spacing: 5px; font-size: 25px">
+                <strong>${acc.codeOTP}</strong>
+              </p>
+              <p>
+                Your account will be successfully activated upon completion of these
+                steps. If you did not initiate this action or have any concerns,
+                please contact our support team immediately
+              </p>
+            </div>
+            <p>
+              Thank you for choosing OneAcademy!<br />
+              © 2023, One Academy. All rights reserved.
+            </p>
+          </div>`,
       };
 
       transporter.sendMail(mailOptions, (err) => {
@@ -401,63 +413,68 @@ module.exports = {
         // html: `<p>Reset Password </p><a href="localhost:5000/set-password/${encrypt}">Click Here</a><br></br><p>Paste this url to your browser if you cant click link above</p><p>localhost:5000/set-password/${encrypt}</p>`,
         html: `<div
         style="
-            text-align: center;
-            padding: 1rem;
-            border-radius: 5px;
-            background-color: #6148ff;
-            color: white;
-            font-family: 'Montserrat', Tahoma, Geneva, Verdana, sans-serif;
+          text-align: center;
+          padding: 1rem;
+          border-radius: 5px;
+          background-color: #6148ff;
+          color: white;
+          font-family: 'Montserrat', Tahoma, Geneva, Verdana, sans-serif;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column;
+          min-height: 80dvh;
         "
-    >
+      >
         <h1>Reset Password</h1>
         <img
-            src="https://i.imgur.com/tpY1Mr8.png"
-            alt="One Academy"
-            style="margin-bottom: 1.5rem"
+          src="https://i.imgur.com/tpY1Mr8.png"
+          alt="One Academy"
+          style="width: 55dvw"
         />
         <div
+          style="
+            background-color: white;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 20px;
+            color: black;
+            max-width: 70dvw;
+            max-height: 50dvh;
+            margin-top: 10px;
+          "
+        >
+          <p>Hello <span style="font-weight: 700">${findUser.profile.name},</span></p>
+  
+          <p style="margin-bottom: 15px">
+            We received a request to reset your account password. To proceed with
+            the password reset, please click reset password button bellow:
+          </p>
+  
+          <a
+            href="https://oneacademy-staging.pemudasukses.tech/forgot/${encrypt}"
             style="
-                background-color: white;
-                border-radius: 10px;
-                padding: 1rem;
-                margin-bottom: 10px;
-                color: black;
+              background-color: #6148ff;
+              color: white;
+              padding: 10px;
+              border-radius: 5px;
+              text-decoration: none;
             "
-        >
-            <p>
-                Hello <span style="font-weight: 700">${findUser.profile.name},</span>
-            </p>
-
-            <p style="margin-bottom: 15px">
-                We received a request to reset your account password. To
-                proceed with the password reset, please click reset password
-                button bellow:
-            </p>
-
-            <a
-                href="https://localhost:5000/set-password/${encrypt}"
-                style="
-                    background-color: #6148ff;
-                    color: white;
-                    padding: 10px;
-                    border-radius: 5px;
-                    text-decoration: none;
-                "
-                ><strong>Reset Password</strong></a
-            >
-
-            <p>
-                Please note that this verification code is valid for a
-                limited time. If you did not initiate this password reset or
-                have any concerns, please contact our support team
-                immediately.
-            </p>
+            ><strong>Reset Password</strong></a
+          >
+  
+          <p>
+            Please note that this verification code is valid for a limited time.
+            If you did not initiate this password reset or have any concerns,
+            please contact our support team immediately.
+          </p>
         </div>
-        <small
-            >Thank you for choosing OneAcademy!<br />
-            © 2023, One Academy. All rights reserved.</small
-        >
-    </div>`,
+  
+        <p>
+          Thank you for choosing OneAcademy!<br />
+          © 2023, One Academy. All rights reserved.
+        </p>
+      </div>`,
       };
 
       transporter.sendMail(mailOptions, (err) => {
