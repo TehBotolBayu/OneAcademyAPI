@@ -150,21 +150,18 @@ module.exports = {
         });
       }
 
-      const materials = await Materials.findMany({
-        where: {
-          courseId: course.id,
-        },
-      });
-
       const chapters = await Chapters.findMany({
         where: {
           courseId: course.id,
         },
+        include : {
+          material: {
+          }
+        }
       });
 
       return res.status(201).json({
         course,
-        materials,
         chapters,
       });
     } catch (error) {
