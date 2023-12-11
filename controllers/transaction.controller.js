@@ -221,4 +221,67 @@ module.exports = {
       return res.status(500).json({ error: error.message });
     }
   },
+
+  getAllTransaction: async (req, res) => {
+    const { page, record } = req.query;
+    try {
+      const take = parseInt(record, 10) || 10;
+      const currentPage = parseInt(page, 10) || 1;
+
+      const options = {
+        take,
+        skip: (currentPage - 1) * take,
+        include: {
+          user: {
+            select: {
+              profile: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+          course: {
+            select: {
+              title: true,
+              courseType: true,
+              category: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      };
+
+      const [transactions, totalRows] = await Promise.all([
+        Transactions.findMany(options),
+        Transactions.count(),
+      ]);
+
+      const totalPages = Math.ceil(totalRows / take);
+
+      let previousPage = null;
+      if (currentPage > 1) {
+        previousPage = currentPage - 1;
+      }
+
+      let nextPage = null;
+      if (!page || currentPage < totalPages) {
+        nextPage = currentPage + 1;
+      }
+
+      return res.status(200).json({
+        transactions,
+        previousPage,
+        nextPage,
+        totalRows,
+        totalPages,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json({ error: error.message });
+    }
+  },
 };

@@ -7,6 +7,7 @@ const express = require('express'),
 router.post('/:id/buy', middleware.checkToken, controller.buyCourse);
 router.get('/:id/detailTransaction', middleware.checkToken, controller.getTransaction);
 router.post('/:id/pay', middleware.checkToken, controller.payTransaction);
+router.get('/', controller.getAllTransaction);
 
 
 
