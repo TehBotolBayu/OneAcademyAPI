@@ -18,8 +18,8 @@ module.exports = {
         },
         include: {
           category: true,
-          image: true, 
-          review : true
+          image: true,
+          review: true,
         },
       });
 
@@ -68,23 +68,23 @@ module.exports = {
       const options = {
         take,
         skip: (currentPage - 1) * take,
-        include : {
-          category : {
-            select : {
-              name : true,
-            }
+        include: {
+          category: {
+            select: {
+              name: true,
+            },
           },
-          image : {
-            select : {
-              url : true,
-            }
+          image: {
+            select: {
+              url: true,
+            },
           },
-          review : {
-            select : {
-              score : true,
-            }
-          }
-        }
+          review: {
+            select: {
+              score: true,
+            },
+          },
+        },
       };
 
       const [courses, totalRows] = await Promise.all([
@@ -150,21 +150,18 @@ module.exports = {
         });
       }
 
-      const materials = await Materials.findMany({
-        where: {
-          courseId: course.id,
-        },
-      });
-
       const chapters = await Chapters.findMany({
         where: {
           courseId: course.id,
         },
+        include : {
+          material: {
+          }
+        }
       });
 
       return res.status(201).json({
         course,
-        materials,
         chapters,
       });
     } catch (error) {
