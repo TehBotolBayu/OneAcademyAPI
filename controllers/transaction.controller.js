@@ -133,7 +133,20 @@ module.exports = {
       // Cari transaksi berdasarkan id
       const transaction = await Transactions.findUnique({
         where: { id },
-        include: { course: true, user: true },
+        include: {
+          course: true,
+          user: {
+            select: {
+              id: true,
+              email: true,
+              profile: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+        },
       });
 
       if (!transaction) {
@@ -195,13 +208,91 @@ module.exports = {
         from: "system@gmail.com",
         to: transaction.user.email,
         subject: "E-Receipt Course",
-        html: `<p>Berikut adalah E-Receipt Anda :</p>
-        <p>Id Transaksi : ${id} </p>
-        <p>Course : ${transaction.course.title} </p>
-        <p>Harga : ${transaction.totalPrice} </p>
-        <p>Tanggal Pembayaran : ${updatedTransaction.paymentDate} </p>
-        <p>Metode Pembayaran : ${updatedTransaction.paymentMethod} </p>
-        <p>Status : ${updatedTransaction.status} </p>
+        html: `<div>
+        <div
+          style="
+            text-align: center;
+            padding: 1rem;
+            border-radius: 5px;
+            background-color: #6148ff;
+            color: white;
+            font-family: 'Montserrat', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 80dvh;
+          "
+        >
+          <img
+            src="https://i.imgur.com/tpY1Mr8.png"
+            alt="One Academy"
+            style="width: 55dvw"
+          />
+          <h1>Thank You For Your Purchase</h1>
+          <div
+            style="
+              background-color: white;
+              border-radius: 10px;
+              padding: 1rem;
+              margin-bottom: 20px;
+              color: black;
+              max-width: 80dvw;
+              max-height: 50dvh;
+              margin-top: 10px;
+            "
+          >
+            <p>
+              Hi <span style="font-weight: 700">${transaction.user.profile.name},</span> <br />
+              Thanks for your purchase from OneAcademy.
+            </p>
+  
+            <table style="width: 100%; text-align: left">
+              <h5>YOUR ORDER INFORMATION :</h5>
+              <tr>
+                <th>Order ID :</th>
+                <th>Order Date :</th>
+              </tr>
+              <tr>
+                <td>${id}</td>
+                <td>${updatedTransaction.paymentDate}</td>
+              </tr>
+              <tr>
+                <th>Course Name :</th>
+                <th>Price :</th>
+              </tr>
+              <tr>
+                <td>${transaction.course.title}</td>
+                <td>${transaction.totalPrice}</td>
+              </tr>
+            </table>
+  
+            <p style="text-align: left">
+              Payment Method : <br />
+             ${updatedTransaction.paymentMethod}
+            </p>
+  
+            <div
+              style="
+                background-color: rgb(13, 82, 255);
+                color: white;
+                border-radius: 10px;
+                padding: 10px;
+                font-size: 20px;
+              "
+            >
+              ${updatedTransaction.status}
+            </div>
+          </div>
+          <small style="color: white; font-style: italic"
+            >Please keep a copy of this receipt for your records.</small
+          >
+          <p>
+            Thank you for choosing OneAcademy!<br />
+            © 2023, One Academy. All rights reserved.
+          </p>
+        </div>
+      </div>
         `,
       };
 
