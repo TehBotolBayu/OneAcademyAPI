@@ -221,7 +221,7 @@ module.exports = {
         <img
           src="https://i.imgur.com/nhNpkBd.png"
           alt="One Academy"
-          style="width: 45dvw"
+          style="width: 15dvw"
         />
         <h1>Thank You For Your Purchase</h1>
         <div
