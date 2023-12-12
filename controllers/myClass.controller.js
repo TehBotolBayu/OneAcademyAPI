@@ -1,5 +1,4 @@
 const { Transactions, Courses } = require("../models");
-const nodemailer = require("nodemailer");
 const checkToken = require("../middlewares/auth");
 
 module.exports = {
