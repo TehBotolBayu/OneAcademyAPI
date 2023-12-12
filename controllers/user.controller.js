@@ -109,9 +109,7 @@ module.exports = {
       const user = await services.getDetail(userId);
 
       if (!user) {
-        return res.status(404).json({
-          error: "User not found!",
-        });
+        return res.status(200).json({profile : userRes});
       }
 
       const userRes = views.userDetail(user);
