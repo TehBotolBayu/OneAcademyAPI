@@ -103,18 +103,14 @@ module.exports = {
           background-color: #6148ff;
           color: white;
           font-family: 'Montserrat', Tahoma, Geneva, Verdana, sans-serif;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          flex-direction: column;
-          min-height: 80dvh;
+          margin: 0 auto;
         "
       >
         <h1>Activation Account</h1>
         <img
-          src="https://i.imgur.com/tpY1Mr8.png"
+          src="https://i.imgur.com/nhNpkBd.png"
           alt="One Academy"
-          style="width: 55dvw"
+          style="width: 45dvw"
         />
         <div
           style="
@@ -123,9 +119,10 @@ module.exports = {
             padding: 1rem;
             margin-bottom: 20px;
             color: black;
-            max-width: 70dvw;
-            max-height: 50dvh;
+            max-width: 60dvw;
+            max-height: 60dvh;
             margin-top: 10px;
+            margin: 0 auto;
           "
         >
           <p>Hello <span style="font-weight: 700">${profile.name},</span></p>
@@ -142,7 +139,7 @@ module.exports = {
           <p>
             Your account will be successfully activated upon completion of these
             steps. If you did not initiate this action or have any concerns,
-            please contact our support team immediately
+            please contact our support team immediately.
           </p>
         </div>
         <p>
@@ -419,18 +416,13 @@ module.exports = {
           background-color: #6148ff;
           color: white;
           font-family: 'Montserrat', Tahoma, Geneva, Verdana, sans-serif;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          flex-direction: column;
-          min-height: 80dvh;
         "
       >
         <h1>Reset Password</h1>
         <img
-          src="https://i.imgur.com/tpY1Mr8.png"
+          src="https://i.imgur.com/nhNpkBd.png"
           alt="One Academy"
-          style="width: 55dvw"
+          style="width: 45dvw"
         />
         <div
           style="
@@ -439,9 +431,10 @@ module.exports = {
             padding: 1rem;
             margin-bottom: 20px;
             color: black;
-            max-width: 70dvw;
-            max-height: 50dvh;
+            max-width: 60dvw;
+            max-height: 60dvh;
             margin-top: 10px;
+            margin: 0 auto;
           "
         >
           <p>Hello <span style="font-weight: 700">${findUser.profile.name},</span></p>
