@@ -32,6 +32,7 @@ model Users {
   OTPlimit    DateTime?
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
+  course_progress Course_Progress[]
   roleId      Int?
   role        Roles?         @relation(fields: [roleId], references: [id], onDelete: SetNull)
   profile     Profiles?
@@ -96,6 +97,7 @@ model Courses {
   level       String
   price       Float
   description String
+  course_progress Course_Progress[]
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   imageId     String?       @unique
@@ -119,6 +121,7 @@ model Materials {
   updatedAt DateTime @updatedAt
   courseId String
   chapterId String
+  course_progress Course_Progress[]
   course Courses @relation(fields: [courseId], references: [id] ,onDelete: Cascade)
   chapter   Chapters @relation(fields: [chapterId], references: [id], onDelete: Cascade)
 }
@@ -145,4 +148,16 @@ model Images {
   course    Courses?
   profile   Profiles?
   category  Categories?
+}
+
+model Course_Progress {
+  id String @id @default(uuid())
+  userId String
+  courseId String
+  materialId String
+  isCompleted Boolean
+
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course        Courses     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  material        Materials     @relation(fields: [materialId], references: [id], onDelete: Cascade)
 }
