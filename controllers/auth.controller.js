@@ -1,317 +1,314 @@
-const {Users, Profiles, Roles} = require('../models');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
+const { Users, Profiles, Roles } = require("../models");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
 
 async function hashPassword(plaintextPassword) {
-    const hash = await bcrypt.hash(plaintextPassword, 10);
-    return hash;
+  const hash = await bcrypt.hash(plaintextPassword, 10);
+  return hash;
 }
 
-async function cryptPassword(password) {
+const cryptPassword = async (password) => {
     const salt = await bcrypt.genSalt(5);
     return bcrypt.hash(password, salt)
 }
 
 function generateOTP() {
-    var digits = '0123456789'; 
-    let OTP = ''; 
-    for (let i = 0; i < 6; i++ ) { 
-        OTP += digits[Math.floor(Math.random() * 10)]; 
-    } 
-    return OTP; 
-} 
+  var digits = "0123456789";
+  let OTP = "";
+  for (let i = 0; i < 6; i++) {
+    OTP += digits[Math.floor(Math.random() * 10)];
+  }
+  return OTP;
+}
 
 module.exports = {
-    getAllRole: async (req, res) => {
-        try {
-            const roles = await Roles.findMany()
-            return res.status(201).json({
-                roles
-            })
-        } catch (error) {
-            console.log(error);
-            return res.status(500).json({ error: "Something went wrong" });
+  getAllRole: async (req, res) => {
+    try {
+      const roles = await Roles.findMany();
+      return res.status(201).json({
+        roles,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: "Something went wrong" });
+    }
+  },
+
+  createRole: async (req, res) => {
+    try {
+      const role = await Roles.create({
+        data: {
+          name: req.body.name,
+        },
+      });
+      return res.status(201).json({
+        role,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: "Something went wrong" });
+    }
+  },
+
+  register: async (req, res) => {
+    try {
+      let date = new Date();
+      date.setMinutes(date.getMinutes() + 5);
+      date.toISOString();
+      const hashed = await hashPassword(req.body.password);
+      const user = await Users.create({
+        data: {
+          email: req.body.email,
+          phone: req.body.phone,
+          password: hashed,
+          codeOTP: generateOTP(),
+          OTPlimit: date,
+          status: "inactive",
+          role: {
+            connect: { id: parseInt(req.body.roleId) },
+          },
+        },
+      });
+
+      const profile = await Profiles.create({
+        data: {
+          name: req.body.name,
+          user: {
+            connect: { id: user.id },
+          },
+        },
+      });
+
+      const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASSWORD,
+        },
+      });
+
+      const mailOptions = {
+        from: "system@gmail.com",
+        to: req.body.email,
+        subject: "Account Verification",
+<<<<<<< HEAD
+        html: `<p>Your OTP</p><h1>${user.codeOTP}</h1>`,
+=======
+        // html: `<p>Your OTP</p><h1>${user.codeOTP}</h1>`,
+        html : `<div
+        style="
+            text-align: center;
+            padding: 1rem;
+            border-radius: 5px;
+            background-color: #6148ff;
+            color: white;
+            font-family: 'Montserrat', Tahoma, Geneva, Verdana, sans-serif;
+        "
+    >
+        <h1>Activation Account</h1>
+        <img
+            src="https://i.imgur.com/tpY1Mr8.png"
+            alt="One Academy"
+            style="margin-bottom: 1.5rem"
+        />
+        <div
+            style="
+                background-color: white;
+                border-radius: 10px;
+                padding: 1rem;
+                margin-bottom: 10px;
+                color: black;
+            "
+        >
+            <p>
+                Hello <span style="font-weight: 700">${profile.name},</span>
+            </p>
+
+            <p>
+                Thank you for choosing to join OneAcademy!<br />
+                Your account activation is almost complete. To finalize the
+                activation process, please Enter the OTP below :
+            </p>
+
+            <p style="letter-spacing: 5px; font-size: 25px">
+                <strong>${user.codeOTP}</strong>
+            </p>
+            <p>
+                Your account will be successfully activated upon completion
+                of these steps. If you did not initiate this action or have
+                any concerns, please contact our support team immediately
+            </p>
+        </div>
+        <small
+            >Thank you for choosing OneAcademy!<br />
+            © 2023, One Academy. All rights reserved.</small
+        >
+    </div>`
+>>>>>>> c8ff52089770c3b2f03b48d11e8a58cb654b8c9a
+      };
+
+      transporter.sendMail(mailOptions, (err) => {
+        if (err) {
+          console.log(err);
+          return res.status(400);
         }
-    },
+        return res.status(200).json({
+          message: "account is created, OTP sent",
+          user,
+        });
+      });
+    } catch (error) {
+      console.log(error.message);
+      return res.status(400).json({
+        error,
+      });
+    }
+  },
 
-    createRole: async (req, res) => {
-        try {
-            const role = await Roles.create({
-                data: {
-                    name: req.body.name
-                }
-            })
-            return res.status(201).json({
-                role
-            })
-        } catch (error) {
-            console.log(error);
-            return res.status(500).json({ error: "Something went wrong" });
+  verifyOTP: async (req, res) => {
+    try {
+      const acc = await Users.findUnique({
+        where: {
+          email: req.body.email,
+        },
+      });
+
+      if (req.body.OTP == acc.codeOTP) {
+        let now = new Date().toISOString();
+        if (acc.OTPlimit.toISOString() > now) {
+          await Users.update({
+            data: {
+              codeOTP: null,
+              OTPlimit: null,
+              status: "active",
+            },
+            where: {
+              email: req.body.email,
+            },
+          });
+
+          return res.status(200).json({
+            message: "Your Account has activated",
+          });
+        } else {
+          return res.status(400).json({
+            message: "Your OTP is expired, try resetting it",
+          });
         }
-    },
+      } else {
+        return res.status(200).json({
+          message: "Your OTP is invalid",
+        });
+      }
+    } catch (error) {
+      console.log(error.message);
+      return res.status(400).json({
+        error,
+      });
+    }
+  },
 
-    register: async (req, res) => {
-        try {
-            let date = new Date();
-            date.setMinutes(date.getMinutes() + 5);
-            date.toISOString();
-            const hashed = await hashPassword(req.body.password);
-            const user = await Users.create({
-                data: {
-                    email: req.body.email,
-                    phone: req.body.phone,
-                    password: hashed,
-                    codeOTP: generateOTP(),
-                    OTPlimit: date,
-                    status: "inactive",
-                    role: {
-                        connect: {id: parseInt(req.body.roleId)}
-                    }
-                }
-            });
-        
-            const profile = await Profiles.create({
-                data: {
-                    name: req.body.name,
-                    user: {
-                        connect: {id: user.id}
-                    }
-                }
-            });
-
-            const transporter = nodemailer.createTransport({
-                host: "smtp.gmail.com",
-                port: 465,
-                secure: true,
-                auth: {
-                    user: process.env.EMAIL_USER,
-                    pass: process.env.EMAIL_PASSWORD
-                }
-            });
-
-            const mailOptions = {
-                from: 'system@gmail.com',
-                to : req.body.email,
-                subject: "Account Verification",
-                html: `<p>Your OTP</p><h1>${user.codeOTP}</h1>`
-            }
-
-            transporter.sendMail(mailOptions, (err) => {
-                if(err) {
-                    console.log(err)
-                    return res.status(400);
-                }
-                return res.status(200).json({
-                    message: "account is created, OTP sent",
-                    user
-                });
-            })
-        
-            
-        } catch (error) {
-            console.log(error.message);
-            return res.status(400).json({
-                error
-            })
+  resetOTP: async (req, res) => {
+    try {
+      let date = new Date();
+      date.setMinutes(date.getMinutes() + 5);
+      date.toISOString();
+      const acc = await Users.update({
+        data: {
+          codeOTP: generateOTP(),
+          OTPlimit: date,
+        },
+        where: {
+          email: req.body.email,
+        },
+        include : {
+            profile : true
         }
-    },
+      });
 
-    verifyOTP: async (req, res) => {
-        try {
-            const acc = await Users.findUnique({
-                where: {
-                    email: req.body.email
-                }
-            })
-            
-            if(req.body.OTP == acc.codeOTP){
-                let now = new Date().toISOString();
-                if(acc.OTPlimit.toISOString() > now){
-                    await Users.update({
-                        data: {
-                            codeOTP: null,
-                            OTPlimit: null,
-                            status: "active"
-                        },
-                        where: {
-                            email: req.body.email
-                        }
-                    })
+      const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASSWORD,
+        },
+      });
 
-                    return res.status(200).json({
-                        message: "Your Account has activated"
-                    })
-                } else {
-                    return res.status(400).json({
-                        message: "Your OTP is expired, try resetting it"
-                    })
-                }
-            } else {
-                return res.status(200).json({
-                    message: "Your OTP is invalid"
-                })
-            }
-        } catch (error) {
-            console.log(error.message);
-            return res.status(400).json({
-                error
-            })
+      const mailOptions = {
+        from: "system@gmail.com",
+        to: req.body.email,
+        subject: "Account Verification",
+        html: `<div
+                style="
+                    text-align: center;
+                    padding: 1rem;
+                    border-radius: 5px;
+                    background-color: #6148ff;
+                    color: white;
+                    font-family: 'Montserrat', Tahoma, Geneva, Verdana, sans-serif;
+                "
+            >
+                <h1>Activation Account</h1>
+                <img
+                    src="https://i.imgur.com/tpY1Mr8.png"
+                    alt="One Academy"
+                    style="margin-bottom: 1.5rem"
+                />
+                <div
+                    style="
+                        background-color: white;
+                        border-radius: 10px;
+                        padding: 1rem;
+                        margin-bottom: 10px;
+                        color: black;
+                    "
+                >
+                    <p>
+                        Hello <span style="font-weight: 700">${acc.profile.name},</span>
+                    </p>
+    
+                    <p>
+                        Thank you for choosing to join OneAcademy!<br />
+                        Your account activation is almost complete. To finalize the
+                        activation process, please Enter the OTP below :
+                    </p>
+    
+                    <p style="letter-spacing: 5px; font-size: 25px">
+                        <strong>${acc.codeOTP}</strong>
+                    </p>
+                    <p>
+                        Your account will be successfully activated upon completion
+                        of these steps. If you did not initiate this action or have
+                        any concerns, please contact our support team immediately
+                    </p>
+                </div>
+                <small
+                    >Thank you for choosing OneAcademy!<br />
+                    © 2023, One Academy. All rights reserved.</small
+                >
+            </div>`,
+      };
+
+      transporter.sendMail(mailOptions, (err) => {
+        if (err) {
+          console.log(err);
+<<<<<<< HEAD
+          return res.status(400).json({
+            message: "Something went wrong",
+          });
         }
-    },
-
-    resetOTP: async (req, res) => {
-        try {
-            let date = new Date();
-            date.setMinutes(date.getMinutes() + 5);
-            date.toISOString();
-            const acc = await Users.update({
-                data:{
-                    codeOTP: generateOTP(),
-                    OTPlimit: date
-                },
-                where: {
-                    email: req.body.email
-                }
-            })
-
-            const transporter = nodemailer.createTransport({
-                host: "smtp.gmail.com",
-                port: 465,
-                secure: true,
-                auth: {
-                    user: process.env.EMAIL_USER,
-                    pass: process.env.EMAIL_PASSWORD
-                }
-            });
-
-            const mailOptions = {
-                from: 'system@gmail.com',
-                to : req.body.email,
-                subject: "Account Verification",
-                html: `<p>Your OTP</p><h1>${acc.codeOTP}</h1>`
-            }
-
-            transporter.sendMail(mailOptions, (err) => {
-                if(err) {
-                    console.log(err)
-                    return res.status(400);
-                }
-                return res.status(200).json({
-                    message: "We have sent a new OTP, check your email",
-                });
-            })
-
-        } catch (error) {
-            console.log(error.message);
-            return res.status(400).json({
-                error
-            })
-        }
-    },
-
-    login: async (req, res) => {
-        try {
-            const findUser = await Users.findFirst({
-                where: {
-                    email: req.body.email
-                }
-            })
-        
-            if(!findUser){
-                return res.status(404).json({
-                    error: 'Email tidak terdaftar!'
-                });
-            }
-
-            if(findUser.status === "inactive"){
-                return res.status(401).json({
-                    message: "Account is not activated, please enter OTP"
-                })
-            }
-        
-            if(bcrypt.compareSync(req.body.password, findUser.password)){
-                const token = jwt.sign(
-                {
-                    id: findUser.id
-                },
-                'secret_key', 
-                {
-                    expiresIn: '24h'
-                })
-                return res.status(200).json({
-                    data: {
-                        token
-                    },
-                    id: findUser.id
-                })
-            }
-        
-            return res.status(403).json({
-                error: 'Invalid credentials'
-            })
-        } catch (error) {
-            console.log(error.message);
-            res.status(400).json({
-                error
-            })
-        }
-    },
-
-    resetPassword: async (req, res) => {
-        try {
-            const findUser = await Users.findFirst({
-                where: {
-                    email: req.body.email
-                }
-            });
-
-            if(!findUser) {
-                return res.status(400).json({
-                    message: "User not found"
-                });
-            }
-
-            const encrypt = await cryptPassword(req.body.email);
-
-            await Users.update({
-                data: {
-                    resetToken: encrypt,
-                },
-                where: {
-                    id: findUser.id
-                }
-            });
-
-            const transporter = nodemailer.createTransport({
-                host: "smtp.gmail.com",
-                port: 465,
-                secure: true,
-                auth: {
-                    user: process.env.EMAIL_USER,
-                    pass: process.env.EMAIL_PASSWORD
-                }
-            });
-
-            const mailOptions = {
-                from: 'system@gmail.com',
-                to : req.body.email,
-                subject: "Reset Password",
-                html: `<p>Reset Password </p><a href="localhost:5000/set-password/${encrypt}">Click Here</a><br></br><p>Paste this url to your browser if you cant click link above</p><p>localhost:5000/set-password/${encrypt}</p>`
-            }
-
-            transporter.sendMail(mailOptions, (err) => {
-                if(err) {
-                    console.log(err)
-                    return res.status(400).json({
-                        message: "Something went wrong"
-                    });
-                }
 
                 return res.status(200).json({
                     message: "email sent"
                 });
             })
+ 
+            
             
         } catch (error) {
             console.log(error)
@@ -321,34 +318,239 @@ module.exports = {
         }
     },
 
-    setPassword: async (req, res) => {
-        try {
-            
-            const findUser = await Users.findFirst({
-                where: {
-                    resetToken: req.body.key
-                }
-            });
+  setPassword: async (req, res) => {
+    try {
+      const findUser = await Users.findFirst({
+        where: {
+          resetToken: req.body.key,
+        },
+      });
 
-            if(!findUser) {
-                return res.status(400).json({
-                    message: "User not found"
-                });
-            }
+      if (!findUser) {
+        return res.status(400).json({
+          message: "User not found",
+        });
+      }
 
-            await Users.update({
-                data: {
-                    password: await cryptPassword(req.body.password),
-                    resetToken: null
-                },
-                where: {
-                    id: findUser.id
-                }
-            });
+      await Users.update({
+        data: {
+          password: await cryptPassword(req.body.password),
+          resetToken: null,
+        },
+        where: {
+          id: findUser.id,
+        },
+      });
+    
+      return res.status(400);
+    } catch (error) {
+      console.log(error.message);
+      return res.status(400).json({
+        error,
+      });
+    },
+  },
+
+  login: async (req, res) => {
+    try {
+      const findUser = await Users.findFirst({
+        where: {
+          email: req.body.email,
+        },
+      });
+
+      if (!findUser) {
+        return res.status(404).json({
+          error: "Email tidak terdaftar!",
+        });
+      }
+
+      if (findUser.status === "inactive") {
+        return res.status(401).json({
+          message: "Account is not activated, please enter OTP",
+        });
+      }
+
+      if (bcrypt.compareSync(req.body.password, findUser.password)) {
+        const token = jwt.sign(
+          {
+            id: findUser.id,
+          },
+          "secret_key",
+          {
+            expiresIn: "24h",
+          }
+        );
+        return res.status(200).json({
+          data: {
+            token,
+          },
+          id: findUser.id,
+        });
+      }
+
+      return res.status(403).json({
+        error: "Invalid credentials",
+      });
+    } catch (error) {
+      console.log(error.message);
+      res.status(400).json({
+        error,
+      });
+    }
+  },
+
+  resetPassword: async (req, res) => {
+    try {
+      const findUser = await Users.findFirst({
+        where: {
+          email: req.body.email,
+        },
+        include: {
+            profile : true
+        }
+      });
+
+      if (!findUser) {
+        return res.status(400).json({
+          message: "User not found",
+        });
+      }
+
+      const encrypt = await cryptPassword(req.body.email);
+
+      await Users.update({
+        data: {
+          resetToken: encrypt,
+        },
+        where: {
+          id: findUser.id,
+        },
+      });
+
+      const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASSWORD,
+        },
+      });
+
+      const mailOptions = {
+        from: "system@gmail.com",
+        to: req.body.email,
+        subject: "Reset Password",
+        // html: `<p>Reset Password </p><a href="localhost:5000/set-password/${encrypt}">Click Here</a><br></br><p>Paste this url to your browser if you cant click link above</p><p>localhost:5000/set-password/${encrypt}</p>`,
+        html : `<div
+        style="
+            text-align: center;
+            padding: 1rem;
+            border-radius: 5px;
+            background-color: #6148ff;
+            color: white;
+            font-family: 'Montserrat', Tahoma, Geneva, Verdana, sans-serif;
+        "
+    >
+        <h1>Reset Password</h1>
+        <img
+            src="https://i.imgur.com/tpY1Mr8.png"
+            alt="One Academy"
+            style="margin-bottom: 1.5rem"
+        />
+        <div
+            style="
+                background-color: white;
+                border-radius: 10px;
+                padding: 1rem;
+                margin-bottom: 10px;
+                color: black;
+            "
+        >
+            <p>
+                Hello <span style="font-weight: 700">${findUser.profile.name},</span>
+            </p>
+
+            <p style="margin-bottom: 15px">
+                We received a request to reset your account password. To
+                proceed with the password reset, please click reset password
+                button bellow:
+            </p>
+
+            <a
+                href="https://localhost:5000/set-password/${encrypt}"
+                style="
+                    background-color: #6148ff;
+                    color: white;
+                    padding: 10px;
+                    border-radius: 5px;
+                    text-decoration: none;
+                "
+                ><strong>Reset Password</strong></a
+            >
+
+            <p>
+                Please note that this verification code is valid for a
+                limited time. If you did not initiate this password reset or
+                have any concerns, please contact our support team
+                immediately.
+            </p>
+        </div>
+        <small
+            >Thank you for choosing OneAcademy!<br />
+            © 2023, One Academy. All rights reserved.</small
+        >
+    </div>`
+      };
+
+      transporter.sendMail(mailOptions, (err) => {
+        if (err) {
+          console.log(err);
+          return res.status(400).json({
+            message: "Something went wrong",
+          });
+        }
+
+        return res.status(200).json({
+          message: "email sent",
+        });
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error,
+      });
+    }
+  },
+
+  setPassword: async (req, res) => {
+    try {
+      const findUser = await Users.findFirst({
+        where: {
+          resetToken: req.body.key,
+        },
+      });
+
+      if (!findUser) {
+        return res.status(400).json({
+          message: "User not found",
+        });
+      }
+
+      await Users.update({
+        data: {
+          password: await cryptPassword(req.body.password),
+          resetToken: null,
+        },
+        where: {
+          id: findUser.id,
+        },
+      });
 
             return res.status(200).json({
                 message: "Password has changed"
-            });
+            });;
             
         } catch (error) {
             console.log(error)
@@ -356,76 +558,6 @@ module.exports = {
                 error
             });
         }
-    },
-
-    update: async (req, res) => {
-        try {
-            const user = await Users.update({
-                data: {
-                    email: req.body.email,
-                    phone: req.body.phone
-                },
-                where: {
-                    id: req.params.userId
-                }
-            })
-            const profile = await Profiles.update({
-                data: {
-                    name: req.body.name,
-                    country: req.body.country,
-                    city: req.body.city,
-                    image: {
-                        connect: {id: res.locals.data.id}
-                    } 
-                },
-                where: {
-                    userId: req.params.userId
-                }
-            })
-
-            return res.status(201).json({
-                message: "updated",
-                user,
-                profile
-            })
-        } catch (error) {
-            console.log(error);
-            return res.status(500).json({ error: "Something went wrong" });
-        }
-    },
-
-    getProfile: async (req,res) => {
-        try {
-            const profile = await Profiles.findUnique({
-                where: {
-                    userId: req.params.userId
-                }
-            })
-
-            return res.status(201).json({
-                profile
-            })
-        } catch (error) {
-            console.log(error);
-            return res.status(500).json({ error: "Something went wrong" });
-        }
-    },
     
-    delete: async (req, res) => {
-        try {
-            const user = await Users.delete({
-                where: {
-                    id: req.params.userId
-                }
-            })
-
-            return res.status(201).json({
-                message: "deleted",
-                user
-            })
-        } catch (error) {
-            console.log(error);
-            return res.status(500).json({ error: "Something went wrong" });
-        }
-    }
+  }
 }
