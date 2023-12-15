@@ -18,7 +18,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      return res.status(400).json({ error: error.message });
+      return res.status(400).json({ error : "Something went wrong" });
     }
   },
 
@@ -39,7 +39,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      return res.status(400).json({ error: error.message });
+      return res.status(400).json({ error : "Something went wrong" });
     }
   },
 
@@ -55,13 +55,13 @@ module.exports = {
           id: req.params.id,
         },
       });
-      return res.status(201).json({
+      return res.status(200).json({
         message: "Chapter was Updated",
         chapter,
       });
     } catch (error) {
       console.log(error);
-      return res.status(400).json({ error: error.message });
+      return res.status(400).json({ error : "Something went wrong" });
     }
   },
 
@@ -77,7 +77,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      return res.status(400).json({ error: error.message });
+      return res.status(400).json({ error : "Something went wrong" });
     }
   },
 };

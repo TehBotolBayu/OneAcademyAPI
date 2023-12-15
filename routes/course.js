@@ -2,6 +2,7 @@ const express = require("express"),
   router = express.Router(),
   courseController = require("../controllers/course.controller"),
   imageController = require("../controllers/image.controller"),
+  auth = require("../middlewares/auth.js"),
   multerLib = require("multer")();
 
 router.post("/create", multerLib.single('image'), imageController.create, courseController.create);
@@ -11,9 +12,9 @@ router.put(
   courseController.updateCourse,
   imageController.updateImage
 );
-router.get("/search", courseController.search);
+router.get("/filterSearch", courseController.filterAndSearch);
 router.get("/", courseController.getAllCourses);
-router.get("/:courseId", courseController.getCourseById);
+router.get("/:courseId",auth.checkToken ,courseController.getCourseById);
 router.delete("/:courseId",  courseController.deleteCourse, imageController.deleteImage);
 
 // SEARCH
