@@ -37,7 +37,7 @@ module.exports = {
         category: category,
       });
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      res.status(500).json({ error : "Something went wrong" });
     }
   },
 
@@ -81,7 +81,7 @@ module.exports = {
 
       return res.status(200).json({ category });
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      res.status(400).json({ error : "Something went wrong" });
     }
   },
 
@@ -156,7 +156,7 @@ module.exports = {
         });
       }
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      res.status(400).json({ error : "Something went wrong" });
     }
   },
 
@@ -196,7 +196,7 @@ module.exports = {
         message: "Delete successfully",
       });
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      res.status(400).json({ error : "Something went wrong" });
     }
   },
 };
