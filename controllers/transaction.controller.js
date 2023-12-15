@@ -1,6 +1,5 @@
 const { Users, Transactions, Courses } = require("../models");
 const nodemailer = require("nodemailer");
-const {formatDateTime} = require ("../utils")
 
 module.exports = {
   getTransaction: async (req, res) => {
@@ -47,11 +46,13 @@ module.exports = {
         transaction: existingTransaction,
       });
     } catch (error) {
-      return res.status(500).json({ error: "Something went wrong" });
+      console.error("Error getting course details:", error);
+      res.sendStatus(500);
     }
   },
 
   buyCourse: async (req, res) => {
+    console.log('tes');
     let date = new Date();
     const { id } = req.params;
     const userId = res.locals.userId;
@@ -148,7 +149,7 @@ module.exports = {
       }
     } catch (error) {
       console.log(error);
-      return res.status(500).json({ error: "Something went wrong" });
+      return res.status(500).json({ error: error.message });
     }
   },
 
@@ -278,7 +279,7 @@ module.exports = {
             </tr>
             <tr>
                <td>${id}</td>
-               <td>${formatDateTime(new Date(updatedTransaction.paymentDate))}</td>
+               <td>${updatedTransaction.paymentDate}</td>
             </tr>
             <tr>
               <th>Course Name :</th>
@@ -331,7 +332,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      return res.status(500).json({ error: "Something went wrong" });
+      return res.status(500).json({ error: error.message });
     }
   },
 
@@ -394,7 +395,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      return res.status(500).json({ error: "Something went wrong" });
+      return res.status(400).json({ error: error.message });
     }
   },
 };
