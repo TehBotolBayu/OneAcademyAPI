@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-const { Users, Profiles, Images } = require("../models");
+const { Users, Profiles, Images, Transactions } = require("../models");
 const { imageKit } = require("../utils");
 
 async function hashPassword(plaintextPassword) {
@@ -231,4 +231,58 @@ module.exports = {
       return res.status(500).json({ error: "Something went wrong" });
     }
   },
+
+  getUserTransaction: async (req, res) => {
+    try {
+      const userId = res.locals.userId;
+
+      // Temukan semua transaksi yang dilakukan oleh pengguna
+      const transaction = await Transactions.findMany({
+        where: {
+          userId,
+        },
+        include: {
+          course: {
+            select: {
+              id: true,
+              title: true,
+              instructor: true,
+              courseType: true,
+              level : true,
+              image : {
+                select : {
+                  url : true,
+                }
+              },
+              category : {
+                select : {
+                  name : true
+                }
+              },
+              review : {
+                select : {
+                  score : true
+                }
+              }
+            },
+          },
+        },
+      });
+
+      if (transaction.length === 0) {
+        return res.json({
+          message: "You haven't purchased any courses yet",
+          transaction
+        });
+      } else {
+        return res.json({
+          transaction,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error : "Something went wrong" });
+    }
+  },
+
 };

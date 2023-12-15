@@ -25,5 +25,6 @@ router.put(
   multerLib.single("avatar"),
   userController.updateUserById,
 );
+router.get("/me/history-transaction", auth.checkToken, userController.getUserTransaction)
 
 module.exports = router;
