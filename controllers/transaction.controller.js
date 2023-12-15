@@ -114,7 +114,35 @@ module.exports = {
           },
         });
 
-        return res.json({ message: "Detail Transaction", transaction, course });
+        const materials = await Materials.findMany({
+          where: {
+            courseId: course.id
+          }
+        })
+
+        const progresses = [];
+
+        materials.forEach(async (e) => {
+          const progress = await Course_Progress.create({
+            data: {
+              isCompleted: false,
+              userId: {
+                connect: {id: userId},
+              },
+              courseId: {
+                connect: {id: course.id},
+              },
+              materialId: {
+                connect: {id: e.id}
+              }
+            }
+          });
+          
+          await progresses.push(progress);
+        });
+
+
+        return res.json({ message: "Detail Transaction", transaction, course, progresses });
       } else {
         return res.status(400).json({ error: "Course invalid" });
       }
