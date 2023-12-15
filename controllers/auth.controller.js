@@ -9,8 +9,10 @@ async function hashPassword(plaintextPassword) {
 }
 
 const cryptPassword = async (password) => {
-    const salt = await bcrypt.genSalt(5);
-    return bcrypt.hash(password, salt)
+  const salt = await bcrypt.genSalt(5);
+  const hash = await bcrypt.hash(password, salt);
+  const encrypted = hash.replace('/', '');
+  return encrypted;
 }
 
 function generateOTP() {
