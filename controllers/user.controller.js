@@ -99,6 +99,17 @@ const services = {
     }),
   findUserByEmail: async ({ email }) => Users.findUnique({ where: { email } }),
   findUserById: async ({ id }) => Users.findUnique({ where: { id } }),
+  getProfileById: async (profileId) =>
+    await Profiles.findUnique({
+      where: { id: profileId },
+      include: {
+        image: {
+          select: {
+            url: true,
+          },
+        },
+      },
+    }),
 };
 
 module.exports = {
@@ -109,13 +120,13 @@ module.exports = {
       const user = await services.getDetail(userId);
 
       if (!user) {
-        return res.status(200).json({profile : userRes});
+        return res.status(404).json({ message: "Profile not found!" });
       }
 
       const userRes = views.userDetail(user);
-      return res.status(200).json(userRes);
+      return res.status(200).json({ profile: userRes });
     } catch (err) {
-      return res.status(500).json({ err });
+      return res.status(500).json({ error: "Something went wrong" });
     }
   },
   updateUserById: async (req, res) => {
@@ -174,11 +185,15 @@ module.exports = {
         });
       }
 
+      const updatedProfile = await services.getProfileById(profile.id);
+
       return res.status(200).json({
-        message: "User updated successfully",
+        message: "Profile updated successfully",
+        profile: updatedProfile,
       });
     } catch (err) {
-      return res.status(500).json({ err });
+      console.log(err);
+      return res.status(500).json({ error: "Something went wrong" });
     }
   },
   changePwd: async (req, res) => {
@@ -213,7 +228,7 @@ module.exports = {
         message: "Password updated!",
       });
     } catch (err) {
-      return res.status(500).json({ err });
+      return res.status(500).json({ error: "Something went wrong" });
     }
   },
 };

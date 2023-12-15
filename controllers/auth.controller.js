@@ -94,7 +94,6 @@ module.exports = {
         from: "system@gmail.com",
         to: req.body.email,
         subject: "Account Verification",
-        // html: `<p>Your OTP</p><h1>${user.codeOTP}</h1>`,
         html: `<div
         style="
           text-align: center;
@@ -154,15 +153,15 @@ module.exports = {
           console.log(err);
           return res.status(400);
         }
-        return res.status(200).json({
+        return res.status(201).json({
           message: "account is created, OTP sent",
           user,
         });
       });
     } catch (error) {
       console.log(error.message);
-      return res.status(400).json({
-        error,
+      return res.status(500).json({
+        message : "Something went wrong"
       });
     }
   },
@@ -204,8 +203,8 @@ module.exports = {
       }
     } catch (error) {
       console.log(error.message);
-      return res.status(400).json({
-        error,
+      return res.status(500).json({
+        error : "Something went wrong"
       });
     }
   },
@@ -356,8 +355,8 @@ module.exports = {
       });
     } catch (error) {
       console.log(error.message);
-      res.status(400).json({
-        error,
+      res.status(500).json({
+        error : "Something went wrong"
       });
     }
   },
@@ -482,7 +481,7 @@ module.exports = {
     } catch (error) {
       console.log(error);
       return res.status(500).json({
-        error,
+        error : "Something went wrong",
       });
     }
   },
@@ -517,7 +516,7 @@ module.exports = {
     } catch (error) {
       console.log(error);
       return res.status(500).json({
-        error,
+        error : "Something went wrong"
       });
     }
   },

@@ -1,32 +1,125 @@
-const { Courses, Images, Materials, Chapters,Transactions } = require("../models");
+const {
+  Courses,Images,Materials,Chapters,Transactions,Categories} = require("../models");
 
 module.exports = {
-  search: async (req, res) => {
+  filterAndSearch: async (req, res) => {
     try {
-      const queryParam = req.query.name;
-      console.log(queryParam);
-      const courses = await Courses.findMany({
-        where: {
-          OR: [
-            { title: { contains: queryParam || "", mode: "insensitive" } },
-            { instructor: { contains: queryParam || "", mode: "insensitive" } },
-            {
-              description: { contains: queryParam || "", mode: "insensitive" },
+      const { sortBy, category, level, promo, courseType, page, record, name } =
+        req.query;
+      const pageNumber = parseInt(page) || 1;
+      const recordPerPageNumber = parseInt(record) || 10;
+      const skipNumber = (pageNumber - 1) * recordPerPageNumber;
+
+      const filters = {
+        newest: { createdAt: "desc" },
+        oldest: { createdAt: "asc" },
+        promo: { price: { lt: 50 } },
+      };
+
+      const categoryFilters = {};
+
+      const allCourses = await Courses.findMany({
+        include: {
+          category: {
+            select: {
+              id: true,
             },
-            { level: { contains: queryParam || "", mode: "insensitive" } },
-          ],
+          },
         },
+      });
+
+      const allCategories = [
+        ...new Set(allCourses.map((course) => course.category.toString())),
+      ];
+
+      allCategories.forEach((categoryId) => {
+        categoryFilters[categoryId] = {
+          category: { id: categoryId },
+        };
+      });
+
+      let query = {
         include: {
           category: true,
           image: true,
           review: true,
         },
+        orderBy: filters.newest,
+        where: {},
+        skip: skipNumber,
+        take: recordPerPageNumber,
+      };
+
+      if (sortBy) {
+        query.orderBy = filters[sortBy];
+      }
+
+      if (category) {
+        const selectedCategories = category.split(",");
+        
+        if (selectedCategories.length > 0) {
+          query.where = {
+            ...query.where,
+            category: {
+              id: {
+                in: selectedCategories,
+              },
+            },
+          };
+        }
+      }
+      if (level) {
+        query.where = { ...query.where, ...levelFilters[level] };
+      }
+
+      if (promo && filters.promo) {
+        query.where = { ...query.where, ...filters.promo };
+      }
+
+      if (courseType) {
+        query.where = { ...query.where, ...courseTypeFilters[courseType] };
+      }
+
+      if (name) {
+        let nameQuery = {
+          OR: [
+            { title: { contains: name || "", mode: "insensitive" } },
+            { instructor: { contains: name || "", mode: "insensitive" } },
+            { description: { contains: name || "", mode: "insensitive" } },
+            { level: { contains: name || "", mode: "insensitive" } },
+          ],
+        };
+
+        if (query.where.OR) {
+          nameQuery = {
+            AND: [{ OR: query.where.OR }, nameQuery],
+          };
+        }
+
+        query.where = { ...query.where, ...nameQuery };
+      }
+
+      const totalCount = await Courses.count({
+        where: query.where,
       });
 
-      return res.json(courses);
+      const totalPages = Math.ceil(totalCount / recordPerPageNumber);
+
+      const courses = await Courses.findMany(query);
+
+      const previousPage = pageNumber > 1 ? pageNumber - 1 : null;
+      const nextPage = pageNumber < totalPages ? pageNumber + 1 : null;
+
+      res.json({
+        courses,
+        previousPage,
+        nextPage,
+        totalRows: totalCount,
+        totalPages,
+      });
     } catch (error) {
-      console.log(error);
-      return res.status(500).json({ error: "Something went wrong" });
+      console.error("Something went wrong:", error);
+      res.status(500).json({ error: "Something went wrong" });
     }
   },
 
@@ -50,11 +143,12 @@ module.exports = {
         },
       });
       return res.status(201).json({
+        message: "Course created successfully",
         course,
       });
     } catch (error) {
       console.log(error);
-      return res.status(400).json({ error: error.message });
+      return res.status(500).json({ error: "something went wrong" });
     }
   },
 
@@ -115,34 +209,34 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      return res.status(400).json({ error: error.message });
+      return res.status(500).json({ error : "Something went wrong" });
     }
   },
 
   getCourseById: async (req, res) => {
     try {
-      // const userId = res.locals.userId;
+      const userId = res.locals.userId;
       const course = await Courses.findUnique({
         where: {
           id: req.params.courseId,
         },
-        include : {
-          category : {
-            select : {
-              name : true
-            }
+        include: {
+          category: {
+            select: {
+              name: true,
+            },
           },
-          image : {
-            select : {
-              url : true,
-            }
+          image: {
+            select: {
+              url: true,
+            },
           },
-          review : {
-            select : {
-              score : true,
-            }
-          }
-        }
+          review: {
+            select: {
+              score: true,
+            },
+          },
+        },
       });
 
       if (!course) {
@@ -151,43 +245,31 @@ module.exports = {
         });
       }
 
-       // Ambil data transaksi berdasarkan courseId dan userId (misalnya dari session atau token)
-    // const transaction = await Transactions.findUnique({
-    //   where: {
-    //     courseId: courseId,
-    //     userId: userId,
-    //   },
-    // });
-
-    // let canJoinCourse = false;
-    // let paymentStatus = "Belum Bayar";
-    // if (transaction) {
-    //   // Jika transaksi ditemukan, periksa status pembayaran
-    //   if (transaction.status === "Sudah Bayar") {
-    //     canJoinCourse = true;
-    //     paymentStatus = "Sudah Bayar";
-    //   } else {
-    //     paymentStatus = "Belum Bayar";
-    //   }
-    // }
+      // Ambil data transaksi berdasarkan courseId dan userId (misalnya dari session atau token)
+      const transaction = await Transactions.findUnique({
+        where: {
+          courseId: course.id,
+          userId: userId,
+        },
+      });
 
       const chapters = await Chapters.findMany({
         where: {
           courseId: course.id,
         },
-        include : {
-          material: {
-          }
-        }
+        include: {
+          material: {},
+        },
       });
 
       return res.status(201).json({
         course,
         chapters,
+        transaction 
       });
     } catch (error) {
       console.log(error);
-      return res.status(400).json({ error: error.message });
+      return res.status(500).json({ error : "Something went wrong" });
     }
   },
   updateCourse: async (req, res, next) => {
@@ -233,8 +315,7 @@ module.exports = {
       next();
     } catch (error) {
       console.log(error);
-      return res.status(400).json({ error: error.message });
+      return res.status(500).json({ error: error.message });
     }
   },
-  
 };
