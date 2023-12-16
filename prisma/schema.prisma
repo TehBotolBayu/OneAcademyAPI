@@ -97,7 +97,6 @@ model Courses {
   level       String
   price       Float
   description String
-  course_progress Course_Progress[]
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   imageId     String?       @unique
@@ -108,6 +107,7 @@ model Courses {
   material Materials[] 
   review      Reviews[]
   chapter    Chapters[]
+  course_progress Course_Progress[]
 }
 
 model Materials {
@@ -151,11 +151,11 @@ model Images {
 }
 
 model Course_Progress {
-  id String @id @default(uuid())
   userId String
   courseId String
   materialId String
   isCompleted Boolean
+  @@id([userId, materialId])
 
   user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
   course        Courses     @relation(fields: [courseId], references: [id], onDelete: Cascade)

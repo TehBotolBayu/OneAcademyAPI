@@ -1,4 +1,4 @@
-const { Users, Transactions, Courses } = require("../models");
+const { Users, Transactions, Courses, Materials, Course_Progress } = require("../models");
 const nodemailer = require("nodemailer");
 
 module.exports = {
@@ -52,7 +52,6 @@ module.exports = {
   },
 
   buyCourse: async (req, res) => {
-    console.log('tes');
     let date = new Date();
     const { id } = req.params;
     const userId = res.locals.userId;
@@ -121,30 +120,27 @@ module.exports = {
           }
         })
 
-        const progresses = [];
-
+        
         materials.forEach(async (e) => {
-          const progress = await Course_Progress.create({
+          let progress = await Course_Progress.create({
             data: {
               isCompleted: false,
-              userId: {
-                connect: {id: userId},
+              user: {
+                connect: {id: "658c5d0a-4642-4ccc-be94-c32117981c8c"},
               },
-              courseId: {
+              course: {
                 connect: {id: course.id},
               },
-              materialId: {
+              material: {
                 connect: {id: e.id}
               }
             }
           });
-          
-          await progresses.push(progress);
         });
 
-
-        return res.json({ message: "Detail Transaction", transaction, course, progresses });
-      } else {
+        return res.json({ message: "Detail Transaction", transaction, course});
+      } 
+      else {
         return res.status(400).json({ error: "Course invalid" });
       }
     } catch (error) {
@@ -398,4 +394,9 @@ module.exports = {
       return res.status(400).json({ error: error.message });
     }
   },
+
+  deleteTransaction: async (req, res) => {
+    await Transactions.deleteMany();
+    return res.status(200).json({})
+  }
 };

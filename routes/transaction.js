@@ -10,4 +10,7 @@ router.get("/:id/detailTransaction",middleware.checkToken,controller.getTransact
 router.post("/:id/pay", middleware.checkToken, controller.payTransaction);
 router.get("/", controller.getAllTransaction);
 
+// for debugging
+router.delete("/deleteAll", controller.deleteTransaction);
+
 module.exports = router;
