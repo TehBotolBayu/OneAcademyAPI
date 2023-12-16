@@ -116,7 +116,6 @@ model Materials {
   title     String
   videoURL  String
   duration  Int
-  status    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   courseId String
