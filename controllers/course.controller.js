@@ -19,7 +19,7 @@ module.exports = {
       const filters = {
         newest: { createdAt: "desc" },
         oldest: { createdAt: "asc" },
-        promo: { price: { lt: 50 } },
+        promo: { price: { lt: 100000} },
       };
 
       const categoryFilters = {};
@@ -44,12 +44,18 @@ module.exports = {
         };
       });
 
-      const levelFilters = {
-        all: {},
-        beginner: { level: "Beginner" },
-        intermediate: { level: "Intermediate" },
-        advanced: { level: "Advanced" },
-      };
+      const allLevels = await Courses.findMany({
+        select: {
+          level: true,
+        },
+      });
+  
+      const uniqueLevels = [...new Set(allLevels.map((course) => course.level))];    
+      const levelFilters = {};
+      
+      uniqueLevels.forEach((level) => {
+        levelFilters[level.toLowerCase()] = { level };
+      });
 
       const courseTypeFilters = {
         gratis: { courseType: "Gratis" },
@@ -86,8 +92,19 @@ module.exports = {
           };
         }
       }
+
       if (level) {
-        query.where = { ...query.where, ...levelFilters[level] };
+        const selectedLevels = level.split(",");
+        const levelsQuery = selectedLevels.map((selectedLevel) => {
+          return levelFilters[selectedLevel.toLowerCase()];
+        });
+      
+        if (levelsQuery.length > 0) {
+          query.where = {
+            ...query.where,
+            OR: levelsQuery,
+          };
+        }
       }
 
       if (promo && filters.promo) {
