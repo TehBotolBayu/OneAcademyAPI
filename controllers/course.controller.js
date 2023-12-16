@@ -1,5 +1,11 @@
 const {
-  Courses,Images,Materials,Chapters,Transactions,Categories} = require("../models");
+  Courses,
+  Images,
+  Materials,
+  Chapters,
+  Transactions,
+  Categories,
+} = require("../models");
 
 module.exports = {
   filterAndSearch: async (req, res) => {
@@ -38,6 +44,18 @@ module.exports = {
         };
       });
 
+      const levelFilters = {
+        all: {},
+        beginner: { level: "Beginner" },
+        intermediate: { level: "Intermediate" },
+        advanced: { level: "Advanced" },
+      };
+
+      const courseTypeFilters = {
+        gratis: { courseType: "Gratis" },
+        premium: { courseType: "Premium" },
+      };
+
       let query = {
         include: {
           category: true,
@@ -56,7 +74,7 @@ module.exports = {
 
       if (category) {
         const selectedCategories = category.split(",");
-        
+
         if (selectedCategories.length > 0) {
           query.where = {
             ...query.where,
@@ -209,7 +227,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      return res.status(500).json({ error : "Something went wrong" });
+      return res.status(500).json({ error: "Something went wrong" });
     }
   },
 
@@ -265,11 +283,11 @@ module.exports = {
       return res.status(201).json({
         course,
         chapters,
-        transaction 
+        transaction,
       });
     } catch (error) {
       console.log(error);
-      return res.status(500).json({ error : "Something went wrong" });
+      return res.status(500).json({ error: "Something went wrong" });
     }
   },
   updateCourse: async (req, res, next) => {
