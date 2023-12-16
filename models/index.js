@@ -13,4 +13,5 @@ module.exports = {
   Materials: prisma.Materials,
   Chapters: prisma.Chapters,
   Images: prisma.Images,
+  Course_Progress: prisma.Course_Progress,
 };

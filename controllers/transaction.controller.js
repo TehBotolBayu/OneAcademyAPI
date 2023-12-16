@@ -1,6 +1,5 @@
-const { Users, Transactions, Courses } = require("../models");
+const { Users, Transactions, Courses, Materials, Course_Progress } = require("../models");
 const nodemailer = require("nodemailer");
-const {formatDateTime} = require ("../utils")
 
 module.exports = {
   getTransaction: async (req, res) => {
@@ -47,7 +46,8 @@ module.exports = {
         transaction: existingTransaction,
       });
     } catch (error) {
-      return res.status(500).json({ error: "Something went wrong" });
+      console.error("Error getting course details:", error);
+      res.sendStatus(500);
     }
   },
 
@@ -114,13 +114,38 @@ module.exports = {
           },
         });
 
-        return res.json({ message: "Detail Transaction", transaction, course });
-      } else {
+        const materials = await Materials.findMany({
+          where: {
+            courseId: course.id
+          }
+        })
+
+        
+        materials.forEach(async (e) => {
+          let progress = await Course_Progress.create({
+            data: {
+              isCompleted: false,
+              user: {
+                connect: {id: "658c5d0a-4642-4ccc-be94-c32117981c8c"},
+              },
+              course: {
+                connect: {id: course.id},
+              },
+              material: {
+                connect: {id: e.id}
+              }
+            }
+          });
+        });
+
+        return res.json({ message: "Detail Transaction", transaction, course});
+      } 
+      else {
         return res.status(400).json({ error: "Course invalid" });
       }
     } catch (error) {
       console.log(error);
-      return res.status(500).json({ error: "Something went wrong" });
+      return res.status(500).json({ error: error.message });
     }
   },
 
@@ -250,7 +275,7 @@ module.exports = {
             </tr>
             <tr>
                <td>${id}</td>
-               <td>${formatDateTime(new Date(updatedTransaction.paymentDate))}</td>
+               <td>${updatedTransaction.paymentDate}</td>
             </tr>
             <tr>
               <th>Course Name :</th>
@@ -303,7 +328,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      return res.status(500).json({ error: "Something went wrong" });
+      return res.status(500).json({ error: error.message });
     }
   },
 
@@ -366,7 +391,12 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      return res.status(500).json({ error: "Something went wrong" });
+      return res.status(400).json({ error: error.message });
     }
   },
+
+  deleteTransaction: async (req, res) => {
+    await Transactions.deleteMany();
+    return res.status(200).json({})
+  }
 };
