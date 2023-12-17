@@ -11,6 +11,6 @@ router.post("/:id/pay", middleware.checkToken, controller.payTransaction);
 router.get("/", controller.getAllTransaction);
 
 // for debugging
-router.delete("/deleteAll", controller.deleteTransaction);
+// router.delete("/deleteAll", controller.deleteTransaction);
 
 module.exports = router;

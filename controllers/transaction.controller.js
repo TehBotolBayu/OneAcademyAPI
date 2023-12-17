@@ -126,7 +126,7 @@ module.exports = {
             data: {
               isCompleted: false,
               user: {
-                connect: {id: "658c5d0a-4642-4ccc-be94-c32117981c8c"},
+                connect: {id: userId},
               },
               course: {
                 connect: {id: course.id},
