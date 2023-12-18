@@ -1,5 +1,6 @@
 const { Users, Transactions, Courses, Materials, Course_Progress } = require("../models");
 const nodemailer = require("nodemailer");
+const { formatDateTime } = require("../utils");
 
 module.exports = {
   getTransaction: async (req, res) => {
@@ -126,7 +127,7 @@ module.exports = {
             data: {
               isCompleted: false,
               user: {
-                connect: {id: "658c5d0a-4642-4ccc-be94-c32117981c8c"},
+                connect: {id: userId},
               },
               course: {
                 connect: {id: course.id},
@@ -275,7 +276,7 @@ module.exports = {
             </tr>
             <tr>
                <td>${id}</td>
-               <td>${updatedTransaction.paymentDate}</td>
+               <td>${formatDateTime(updatedTransaction.paymentDate)}</td>
             </tr>
             <tr>
               <th>Course Name :</th>

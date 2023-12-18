@@ -2,6 +2,7 @@ const { Users, Profiles, Roles } = require("../models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
+const { revokeToken } = require("../middlewares/auth");
 
 async function hashPassword(plaintextPassword) {
   const hash = await bcrypt.hash(plaintextPassword, 10);
@@ -11,9 +12,9 @@ async function hashPassword(plaintextPassword) {
 const cryptPassword = async (password) => {
   const salt = await bcrypt.genSalt(5);
   const hash = await bcrypt.hash(password, salt);
-  const encrypted = hash.replace('/', '');
+  const encrypted = hash.replace("/", "");
   return encrypted;
-}
+};
 
 function generateOTP() {
   var digits = "0123456789";
@@ -163,7 +164,7 @@ module.exports = {
     } catch (error) {
       console.log(error.message);
       return res.status(500).json({
-        message : "Something went wrong"
+        message: "Something went wrong",
       });
     }
   },
@@ -206,7 +207,7 @@ module.exports = {
     } catch (error) {
       console.log(error.message);
       return res.status(500).json({
-        error : "Something went wrong"
+        error: "Something went wrong",
       });
     }
   },
@@ -358,7 +359,35 @@ module.exports = {
     } catch (error) {
       console.log(error.message);
       res.status(500).json({
-        error : "Something went wrong"
+        error: "Something went wrong",
+      });
+    }
+  },
+
+  logout: async (req, res) => {
+    const token = req.headers.authorization;
+    try {
+      if (!token) {
+        return res.status(403).json({
+          error: "please provide a token",
+        });
+      }
+
+      let tokenValue = token;
+
+      if (tokenValue.toLowerCase().startsWith("bearer")) {
+        tokenValue = tokenValue.slice(6).trim();
+      }
+
+      revokeToken(tokenValue);
+
+      return res.status(200).json({
+        message: "Logout successful",
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        error: "Something went wrong",
       });
     }
   },
@@ -483,7 +512,7 @@ module.exports = {
     } catch (error) {
       console.log(error);
       return res.status(500).json({
-        error : "Something went wrong",
+        error: "Something went wrong",
       });
     }
   },
@@ -518,7 +547,7 @@ module.exports = {
     } catch (error) {
       console.log(error);
       return res.status(500).json({
-        error : "Something went wrong"
+        error: "Something went wrong",
       });
     }
   },

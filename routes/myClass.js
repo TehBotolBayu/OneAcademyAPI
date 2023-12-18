@@ -19,7 +19,7 @@ router.put("/progress/complete/:materialId", checkToken, myClassController.setCo
 // localhost:3000/api/v1/myClass/my-classes
 
 // for debugging purpose
-// router.delete('/del', myClassController.deleteProgress);
-// router.get('/getAll', myClassController.getAllProgress)
+router.delete('/del', myClassController.deleteProgress);
+router.get('/getAll', myClassController.getAllProgress)
 
 module.exports = router;

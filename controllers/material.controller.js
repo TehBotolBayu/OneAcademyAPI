@@ -9,7 +9,6 @@ module.exports = {
           title: req.body.title,
           videoURL: req.body.videoURL,
           duration: parseInt(req.body.duration),
-          status: "Selesai",
           course: {
             connect: {id: req.body.courseId}
           },
@@ -56,7 +55,6 @@ module.exports = {
           title: req.body.title,
           videoURL: req.body.videoURL,
           duration: req.body.duration,
-          status: req.body.status,
         },
         where : {
             id : req.params.id
