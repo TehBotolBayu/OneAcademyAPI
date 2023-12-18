@@ -160,6 +160,12 @@ module.exports = {
 
   create: async (req, res) => {
     try {
+      // if(res.locals.roleId === 2){
+      //   return res.status(401).json({
+      //     message: "Unauthorized"
+      //   })
+      // }
+
       console.log(res.locals.data.id);
       const course = await Courses.create({
         data: {

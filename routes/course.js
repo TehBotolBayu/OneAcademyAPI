@@ -5,7 +5,7 @@ const express = require("express"),
   auth = require("../middlewares/auth.js"),
   multerLib = require("multer")();
 
-router.post("/create", multerLib.single('image'), imageController.create, courseController.create);
+router.post("/create", auth.checkToken, multerLib.single('image'), imageController.create, courseController.create);
 router.put(
   "/update/:courseId",
   multerLib.single('image'),

@@ -27,6 +27,8 @@ const checkToken = (req, res, next) => {
     const jwtPayLoad = jwt.verify(token, 'secret_key');
     
     res.locals.userId = jwtPayLoad.id
+    res.locals.roleId = jwtPayLoad.roleId
+
 
     if(!jwtPayLoad){
         return res.status(403).json({
