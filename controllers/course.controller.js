@@ -317,6 +317,9 @@ module.exports = {
           level: req.body.level,
           price: parseFloat(req.body.price),
           description: req.body.description,
+          category: {
+            connect: { id: req.body.categoryId },
+          },
         },
         where: {
           id: req.params.courseId,
