@@ -1,45 +1,59 @@
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const revokedTokens = [];
 
 async function hashPassword(plaintextPassword) {
-    const hash = await bcrypt.hash(plaintextPassword, 10);
-    return hash;
+  const hash = await bcrypt.hash(plaintextPassword, 10);
+  return hash;
 }
 
 async function comparePassword(plaintextPassword, hash) {
-    const result = await bcrypt.compare(plaintextPassword, hash);
-    return result;
+  const result = await bcrypt.compare(plaintextPassword, hash);
+  return result;
 }
 
 const checkToken = (req, res, next) => {
-    let token = req.headers.authorization
+  let token = req.headers.authorization;
 
-    if(!token) {
-        return res.status(403).json({
-            error: 'please provide a token'
-        })
-    }
-    
-    if(token.toLowerCase().startsWith("bearer")) {
-        token = token.slice(6).trim()
+  if (!token) {
+    return res.status(403).json({
+      error: "please provide a token",
+    });
+  }
+
+  if (token.toLowerCase().startsWith("bearer")) {
+    token = token.slice(6).trim();
+  }
+
+  try {
+    const jwtPayLoad = jwt.verify(token, "secret_key");
+    if (!jwtPayLoad) {
+      return res.status(403).json({
+        error: "unauthenticated",
+      });
     }
 
-    const jwtPayLoad = jwt.verify(token, 'secret_key');
-    
-    res.locals.userId = jwtPayLoad.id
+    if (revokedTokens.includes(token)) {
+      return res.status(403).json({
+        error: "token has been revoked",
+      });
+    }
+    res.locals.userId = jwtPayLoad.id;
     res.locals.roleId = jwtPayLoad.roleId
 
+    res.user = jwtPayLoad;
 
-    if(!jwtPayLoad){
-        return res.status(403).json({
-            error: 'unauthenticated'
-        })
-    }
+    next();
+  } catch (error) {
+    return res.status(403).json({
+      error: "invalid token",
+    });
+  }
+};
 
-    res.user = jwtPayLoad
+// Fungsi untuk menonaktifkan token
+const revokeToken = (tokenToRevoke) => {
+    revokedTokens.push(tokenToRevoke);
+  };
 
-    next()
-}
-
-
-module.exports = {checkToken};
+module.exports = { checkToken,revokeToken };

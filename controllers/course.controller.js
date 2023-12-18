@@ -286,8 +286,8 @@ module.exports = {
         });
       }
 
-      // Ambil data transaksi berdasarkan courseId dan userId (misalnya dari session atau token)
-      const transaction = await Transactions.findUnique({
+      // Ambil data transaksi berdasarkan courseId dan userId
+      const transaction = await Transactions.findFirst({
         where: {
           courseId: course.id,
           userId: userId,
@@ -323,6 +323,9 @@ module.exports = {
           level: req.body.level,
           price: parseFloat(req.body.price),
           description: req.body.description,
+          category: {
+            connect: { id: req.body.categoryId },
+          },
         },
         where: {
           id: req.params.courseId,
