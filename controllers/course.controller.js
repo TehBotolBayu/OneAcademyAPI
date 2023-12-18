@@ -280,8 +280,8 @@ module.exports = {
         });
       }
 
-      // Ambil data transaksi berdasarkan courseId dan userId (misalnya dari session atau token)
-      const transaction = await Transactions.findUnique({
+      // Ambil data transaksi berdasarkan courseId dan userId
+      const transaction = await Transactions.findFirst({
         where: {
           courseId: course.id,
           userId: userId,
