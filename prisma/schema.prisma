@@ -61,7 +61,7 @@ model Transactions {
   totalPrice    Float
   paymentDate   DateTime
   userId        String?
-  courseId      String?  @unique
+  courseId      String?
   user          Users?   @relation(fields: [userId], references: [id], onDelete: SetNull)
   course        Courses? @relation(fields: [courseId], references: [id], onDelete: SetNull)
 }
@@ -85,7 +85,6 @@ model Categories {
   updatedAt DateTime @updatedAt
   imageId   String?  @unique
   image     Images?  @relation(fields: [imageId], references: [id], onDelete: SetNull)
-
   course Courses[]
 }
 
@@ -103,7 +102,7 @@ model Courses {
   categoryId  String?
   image       Images?       @relation(fields: [imageId], references: [id], onDelete: SetNull)
   category    Categories?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  transaction Transactions?
+  transaction Transactions[]
   material Materials[] 
   review      Reviews[]
   chapter    Chapters[]
