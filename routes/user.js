@@ -6,7 +6,8 @@ const express = require("express"),
   auth = require("../middlewares/auth.js");
 
 router.post("/register", controller.register);
-router.post("/login", controller.login);
+router.post("/login", controller.login); 
+router.post("/logout",auth.checkToken, controller.logout); 
 router.post("/verify", controller.verifyOTP);
 router.post("/resetOTP", controller.resetOTP);
 router.post("/reset-password", controller.resetPassword);
