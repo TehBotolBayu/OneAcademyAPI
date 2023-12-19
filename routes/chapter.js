@@ -1,11 +1,12 @@
 const express = require("express"),
   router = express.Router(),
-  chapterController = require("../controllers/chapter.controller");
+  chapterController = require("../controllers/chapter.controller"),
+  {checkToken} = require('../middlewares/auth');
 
-router.post("/create", chapterController.create);
+router.post("/create", checkToken, chapterController.create);
 router.get("/", chapterController.getAllChapter);
-router.put("/:id",chapterController.update);
-router.delete("/:id",  chapterController.destroy);
+router.put("/:id", checkToken, chapterController.update);
+router.delete("/:id", checkToken, chapterController.destroy);
 // router.get("/:id", chapterController.getCourseById);
 
 

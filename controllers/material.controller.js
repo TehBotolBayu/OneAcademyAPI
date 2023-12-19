@@ -3,6 +3,11 @@ const { Materials } = require("../models");
 module.exports = {
   create: async (req, res) => {
     try {
+      if(res.locals.roleId !== 1){
+        return res.status(401).json({
+          message: "Unauthorized"
+        })
+      }
       const material = await Materials.create({
         data: {
           step: parseInt(req.body.step),
@@ -49,6 +54,11 @@ module.exports = {
 
   update: async (req, res) => {
     try {
+      if(res.locals.roleId !== 1){
+        return res.status(401).json({
+          message: "Unauthorized"
+        })
+      }
       const material = await Materials.update({
         data: {
           step: req.body.step,
@@ -72,6 +82,11 @@ module.exports = {
 
   destroy: async (req, res) => {
     try {
+      if(res.locals.roleId !== 1){
+        return res.status(401).json({
+          message: "Unauthorized"
+        })
+      }
       const material = await Materials.delete({
         where: {
           id: req.params.id,

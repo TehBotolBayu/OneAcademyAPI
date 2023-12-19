@@ -3,6 +3,11 @@ const { Chapters } = require("../models");
 module.exports = {
   create: async (req, res) => {
     try {
+      if(res.locals.roleId !== 1){
+        return res.status(401).json({
+          message: "Unauthorized"
+        })
+      }
       const chapter = await Chapters.create({
         data: {
           totalDuration: parseInt(req.body.totalDuration),
@@ -45,6 +50,11 @@ module.exports = {
 
   update: async (req, res) => {
     try {
+      if(res.locals.roleId !== 1){
+        return res.status(401).json({
+          message: "Unauthorized"
+        })
+      }
       const chapter = await Chapters.update({
         data: {
           totalDuration: req.body.totalDuration,
@@ -67,6 +77,11 @@ module.exports = {
 
   destroy: async (req, res) => {
     try {
+      if(res.locals.roleId !== 1){
+        return res.status(401).json({
+          message: "Unauthorized"
+        })
+      }
       const chapter = await Chapters.delete({
         where: {
           id: req.params.id,

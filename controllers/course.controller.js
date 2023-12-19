@@ -160,11 +160,11 @@ module.exports = {
 
   create: async (req, res) => {
     try {
-      // if(res.locals.roleId === 2){
-      //   return res.status(401).json({
-      //     message: "Unauthorized"
-      //   })
-      // }
+      if(res.locals.roleId !== 1){
+        return res.status(401).json({
+          message: "Unauthorized"
+        })
+      }
 
       console.log(res.locals.data.id);
       const course = await Courses.create({
@@ -315,6 +315,11 @@ module.exports = {
   },
   updateCourse: async (req, res, next) => {
     try {
+      if(res.locals.roleId !== 1){
+        return res.status(401).json({
+          message: "Unauthorized"
+        })
+      }
       const course = await Courses.update({
         data: {
           title: req.body.title,
@@ -341,6 +346,12 @@ module.exports = {
   },
   deleteCourse: async (req, res, next) => {
     try {
+      if(res.locals.roleId !== 1){
+        return res.status(401).json({
+          message: "Unauthorized"
+        })
+      }
+
       const course = await Courses.delete({
         where: {
           id: req.params.courseId,
