@@ -19,7 +19,7 @@ module.exports = {
       const filters = {
         newest: { createdAt: "desc" },
         oldest: { createdAt: "asc" },
-        promo: { price: { lt: 100000} },
+        promo: { price: { lt: 100000 } },
       };
 
       const categoryFilters = {};
@@ -44,18 +44,12 @@ module.exports = {
         };
       });
 
-      const allLevels = await Courses.findMany({
-        select: {
-          level: true,
-        },
-      });
-  
-      const uniqueLevels = [...new Set(allLevels.map((course) => course.level))];    
-      const levelFilters = {};
-      
-      uniqueLevels.forEach((level) => {
-        levelFilters[level.toLowerCase()] = { level };
-      });
+      const levelFilters = {
+        all: {},
+        beginner: { level: "Beginner" },
+        intermediate: { level: "Intermediate" },
+        advanced: { level: "Advanced" },
+      };
 
       const courseTypeFilters = {
         gratis: { courseType: "Gratis" },
