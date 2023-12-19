@@ -39,6 +39,7 @@ const checkToken = (req, res, next) => {
       });
     }
     res.locals.userId = jwtPayLoad.id;
+    res.locals.roleId = jwtPayLoad.roleId
 
     res.user = jwtPayLoad;
 

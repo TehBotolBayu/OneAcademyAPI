@@ -1,12 +1,13 @@
 const express = require("express"),
   router = express.Router(),
-  materialController = require("../controllers/material.controller");
+  materialController = require("../controllers/material.controller"),
+  {checkToken} = require('../middlewares/auth');
 
 
-router.post("/create", materialController.create);
+router.post("/create", checkToken, materialController.create);
 router.get("/", materialController.getAllMaterial);
-router.put("/:id",materialController.update);
-router.delete("/:id",  materialController.destroy);
+router.put("/:id", checkToken, materialController.update);
+router.delete("/:id", checkToken, materialController.destroy);
 // router.get("/:courseId", courseController.getCourseById);
 
 

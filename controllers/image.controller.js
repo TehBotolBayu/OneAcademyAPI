@@ -4,6 +4,12 @@ const {imageKit}  = require("../utils");
 module.exports = {
     create: async (req, res, next) => {
         try {
+            if(res.locals.roleId === 2){
+                return res.status(401).json({
+                  message: "Unauthorized"
+                })
+            }
+            
             let stringFile = undefined;
             if(req.file) stringFile = req.file.buffer.toString('base64');
 

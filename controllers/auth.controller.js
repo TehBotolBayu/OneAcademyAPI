@@ -56,6 +56,18 @@ module.exports = {
 
   register: async (req, res) => {
     try {
+      const existUser = await Users.findUnique({
+        where: {
+          email: req.body.email
+        }
+      })
+
+      if(existUser){
+        return res.status(400).json({
+          message: "Email already registered"
+        })
+      }
+
       let date = new Date();
       date.setMinutes(date.getMinutes() + 5);
       date.toISOString();
@@ -339,6 +351,7 @@ module.exports = {
         const token = jwt.sign(
           {
             id: findUser.id,
+            roleId: findUser.roleId
           },
           "secret_key",
           {
@@ -350,6 +363,7 @@ module.exports = {
             token,
           },
           id: findUser.id,
+          roleId: findUser.roleId,
         });
       }
 

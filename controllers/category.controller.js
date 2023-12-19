@@ -4,6 +4,11 @@ const { imageKit } = require("../utils");
 module.exports = {
   create: async (req, res) => {
     try {
+      if(res.locals.roleId !== 1){
+        return res.status(401).json({
+          message: "Unauthorized"
+        })
+      }
       const { name, image } = req.body;
 
       const fileToString = req.file.buffer.toString("base64");
@@ -87,6 +92,11 @@ module.exports = {
 
   update: async (req, res) => {
     try {
+      if(res.locals.roleId !== 1){
+        return res.status(401).json({
+          message: "Unauthorized"
+        })
+      }
       const id = req.params.id;
       const { name, image } = req.body;
 
@@ -162,6 +172,11 @@ module.exports = {
 
   destroy: async (req, res) => {
     try {
+      if(res.locals.roleId !== 1){
+        return res.status(401).json({
+          message: "Unauthorized"
+        })
+      }
       const id = req.params.id;
 
       const findCategory = await Categories.findUnique({
