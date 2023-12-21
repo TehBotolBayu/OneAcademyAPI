@@ -55,7 +55,7 @@ module.exports = {
       let tes = [];
       
       for(let i =0; i<userClasses.length; i++){
-          console.log(userClasses[0].id)
+          console.log(userClasses[i].id)
           const progress = await Course_Progress.findMany({
             where: {
               courseId: userClasses[i].id
