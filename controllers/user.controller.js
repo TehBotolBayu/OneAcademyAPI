@@ -13,6 +13,7 @@ const views = {
       id,
       email,
       phone,
+      role,
       profile: { name, country, city, image },
     } = userDetail;
 
@@ -23,6 +24,7 @@ const views = {
       phone,
       country,
       city,
+      role,
       avatar: image?.url || null,
     };
   },
@@ -38,6 +40,12 @@ const services = {
         id: true,
         email: true,
         phone: true,
+        role :{
+          select : {
+            id : true,
+            name : true
+          }
+        },
         profile: {
           select: {
             name: true,

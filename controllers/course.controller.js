@@ -293,8 +293,15 @@ module.exports = {
           courseId: course.id,
         },
         include: {
-          material: {},
+          material: {
+            orderBy : {
+              step : "asc"
+            }
+          },
         },
+        orderBy: {
+          step : "asc"
+        }
       });
 
       return res.status(201).json({
