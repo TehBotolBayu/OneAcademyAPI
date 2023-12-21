@@ -39,7 +39,9 @@ module.exports = {
             }
           })
           let status = true;
+            console.log(progress);
           for(let j =0; j<userClasses.length; j++){
+            console.log(progress[j].isCompleted);
             if (progress[j].isCompleted == false){
               status = false;
               break;
