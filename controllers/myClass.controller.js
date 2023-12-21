@@ -41,24 +41,9 @@ module.exports = {
          ({course}) => course
       );
 
-      //debugging
-      console.log("user classes");
-      console.log(userClasses);
-      console.log("user classes");
-      
-          const coba = await Course_Progress.findMany({
-            where: {
-              courseId: userClasses[0].id
-            }
-          })
-
-
-      //debugging
-
       let tes = [];
       
       for(let i =0; i<userClasses.length; i++){
-          console.log(userClasses[i].id)
           const progress = await Course_Progress.findMany({
             where: {
               courseId: userClasses[i].id
@@ -74,17 +59,6 @@ module.exports = {
           }
           userClasses[i].isCompleted = status;
       }
-
-      // userClasses.map(async (element, index) => {
-        // const progress = await Course_Progress.findMany({
-        //   where: {
-        //     courseId: element.id
-        //   }
-        // })
-      //   console.log(progress);
-      //   return element.baru = "tes"
-      // });
-
 
       if (userClasses.length === 0) {
         return res.json({
