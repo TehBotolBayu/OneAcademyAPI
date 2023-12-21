@@ -41,7 +41,16 @@ module.exports = {
          ({course}) => course
       );
 
-      console.log(userClasses);
+      //debugging
+                const tes = await Course_Progress.findMany({
+            where: {
+              courseId: userClasses[0].id
+            }
+          })
+
+      console.log(tes);
+
+      //debugging
 
       let tes = [];
       for(let i =0; i<userClasses.length; i++){
