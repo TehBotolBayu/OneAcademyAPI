@@ -42,13 +42,16 @@ module.exports = {
       );
 
       //debugging
+      console.log("user classes");
+      console.log(userClasses);
+      console.log("user classes");
+      
           const coba = await Course_Progress.findMany({
             where: {
               courseId: userClasses[0].id
             }
           })
 
-      console.log(coba);
 
       //debugging
 
