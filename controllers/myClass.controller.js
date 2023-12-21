@@ -39,14 +39,12 @@ module.exports = {
             }
           })
           let status = true;
-            console.log(progress);
-          for(let j =0; j<userClasses.length; j++){
-            console.log(progress[j].isCompleted);
-            if (progress[j].isCompleted == false){
+          for await(const p of progress){
+            if (p.isCompleted == false){
               status = false;
               break;
             }
-          } 
+          }
           userClasses[i].isCompleted = status;
       }
 
