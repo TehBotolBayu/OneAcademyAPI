@@ -39,24 +39,25 @@ module.exports = {
             }
           })
           let status = true;
-          for(let j =0; j<userClasses.length; j++){
-            if (progress[j].isCompleted == false){
+
+          for await(const p of progress){
+            if (p.isCompleted == false){
               status = false;
               break;
             }
-          } 
+          }
+
+          // for(let j =0; j<userClasses.length; j++){
+          //   console.log(progress[j].isCompleted);
+          //   if (progress[j].isCompleted == false){
+          //     status = false;
+          //     break;
+          //   }
+          // } 
+
           userClasses[i].isCompleted = status;
       }
-
-      // userClasses.map(async (element, index) => {
-        // const progress = await Course_Progress.findMany({
-        //   where: {
-        //     courseId: element.id
-        //   }
-        // })
-      //   console.log(progress);
-      //   return element.baru = "tes"
-      // });
+  
 
 
       if (userClasses.length === 0) {

@@ -1,4 +1,4 @@
-const { Users, Transactions, Courses, Materials, Course_Progress } = require("../models");
+  const { Users, Transactions, Courses, Materials, Course_Progress } = require("../models");
 const nodemailer = require("nodemailer");
 const { formatDateTime } = require("../utils");
 
