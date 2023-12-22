@@ -13,10 +13,9 @@ async function hashPassword(plaintextPassword) {
 const cryptPassword = async (password) => {
   const salt = await bcrypt.genSalt(5);
   const hash = await bcrypt.hash(password, salt);
-  const encrypted = hash.replace(/\//g, '');
+  const encrypted = hash.replace(/\//g, "");
   return encrypted;
 };
-
 
 function generateOTP() {
   var digits = "0123456789";
@@ -31,13 +30,12 @@ const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
   "http://localhost:3000/api/v1/user/auth/google/callback"
-)
+);
 
 const scopes = [
   "https://www.googleapis.com/auth/userinfo.email",
   "https://www.googleapis.com/auth/userinfo.profile",
-]
-
+];
 
 module.exports = {
   oauth2Client,
@@ -422,23 +420,23 @@ module.exports = {
         },
         include: {
           profile: true,
-          role : true
+          role: true,
         },
       });
 
       if (!user) {
-       let user = await Users.create({
+        let user = await Users.create({
           data: {
             email: data.email,
-            password : "",
+            password: "",
             status: "active",
-            phone : "",
+            phone: "",
             profile: {
               create: {
                 name: data.name,
               },
             },
-            roleId : 2
+            roleId: 2,
           },
           include: {
             profile: true,
@@ -460,8 +458,7 @@ module.exports = {
       return res.status(200).json({
         user,
         token,
-      })
-
+      });
     } catch (error) {
       console.log(error);
       res.status(500).json({
@@ -517,9 +514,9 @@ module.exports = {
 
       const encrypt = await cryptPassword(req.body.email);
 
-      return res.status(200).json({
-        encrypt
-      })
+      // return res.status(200).json({
+      //   encrypt,
+      // });
 
       await Users.update({
         data: {
@@ -616,7 +613,7 @@ module.exports = {
 
         return res.status(200).json({
           message: "email sent",
-          encrypt
+          encrypt,
         });
       });
     } catch (error) {
@@ -658,7 +655,6 @@ module.exports = {
       console.log(error);
       return res.status(500).json({
         error: "Something went wrong",
-
       });
     }
   },
