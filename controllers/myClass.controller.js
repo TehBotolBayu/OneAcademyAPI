@@ -26,12 +26,23 @@ module.exports = {
         },
       });
 
+      if(userTransactions.length <= 0) {
+          return res.json({
+          success: true,
+          message: "You haven't purchased any courses yet",
+          userClasses,
+        });
+      }
+
+    
+
       // Buat response yang hanya berisi data kursus dari transaksi pengguna
       const userClasses = userTransactions.map(
          ({course}) => course
       );
 
       let tes = [];
+      
       for(let i =0; i<userClasses.length; i++){
           const progress = await Course_Progress.findMany({
             where: {
@@ -39,26 +50,15 @@ module.exports = {
             }
           })
           let status = true;
-
+          
           for await(const p of progress){
             if (p.isCompleted == false){
               status = false;
               break;
             }
           }
-
-          // for(let j =0; j<userClasses.length; j++){
-          //   console.log(progress[j].isCompleted);
-          //   if (progress[j].isCompleted == false){
-          //     status = false;
-          //     break;
-          //   }
-          // } 
-
           userClasses[i].isCompleted = status;
       }
-  
-
 
       if (userClasses.length === 0) {
         return res.json({
