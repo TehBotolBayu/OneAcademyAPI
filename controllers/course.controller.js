@@ -314,6 +314,7 @@ module.exports = {
       return res.status(500).json({ error: "Something went wrong" });
     }
   },
+  
   updateCourse: async (req, res, next) => {
     try {
       if(res.locals.roleId !== 1){
