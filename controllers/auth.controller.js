@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const { revokeToken } = require("../middlewares/auth");
+const { google } = require("googleapis");
 
 async function hashPassword(plaintextPassword) {
   const hash = await bcrypt.hash(plaintextPassword, 10);
@@ -25,7 +26,21 @@ function generateOTP() {
   return OTP;
 }
 
+const oauth2Client = new google.auth.OAuth2(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET,
+  "http://localhost:3000/api/v1/user/auth/google/callback"
+)
+
+const scopes = [
+  "https://www.googleapis.com/auth/userinfo.email",
+  "https://www.googleapis.com/auth/userinfo.profile",
+]
+
+
 module.exports = {
+  oauth2Client,
+  scopes,
   getAllRole: async (req, res) => {
     try {
       const roles = await Roles.findMany();
@@ -58,14 +73,14 @@ module.exports = {
     try {
       const existUser = await Users.findUnique({
         where: {
-          email: req.body.email
-        }
-      })
+          email: req.body.email,
+        },
+      });
 
-      if(existUser){
+      if (existUser) {
         return res.status(400).json({
-          message: "Email already registered"
-        })
+          message: "Email already registered",
+        });
       }
 
       let date = new Date();
@@ -351,7 +366,7 @@ module.exports = {
         const token = jwt.sign(
           {
             id: findUser.id,
-            roleId: findUser.roleId
+            roleId: findUser.roleId,
           },
           "secret_key",
           {
@@ -372,6 +387,82 @@ module.exports = {
       });
     } catch (error) {
       console.log(error.message);
+      res.status(500).json({
+        error: "Something went wrong",
+      });
+    }
+  },
+
+  loginGoogle: async (req, res) => {
+    try {
+      const { code } = req.query;
+
+      const { tokens } = await oauth2Client.getToken(code);
+
+      oauth2Client.setCredentials(tokens);
+
+      const oauth2 = google.oauth2({
+        auth: oauth2Client,
+        version: "v2",
+      });
+
+      const { data } = await oauth2.userinfo.get();
+
+      if (!data.email || !data.name) {
+        return res.status(400).json({
+          message: "Data not Found",
+          data: data,
+        });
+      }
+
+      const user = await Users.findUnique({
+        where: {
+          email: data.email,
+        },
+        include: {
+          profile: true,
+          role : true
+        },
+      });
+
+      if (!user) {
+       let user = await Users.create({
+          data: {
+            email: data.email,
+            password : "",
+            status: "active",
+            phone : "",
+            profile: {
+              create: {
+                name: data.name,
+              },
+            },
+            roleId : 2
+          },
+          include: {
+            profile: true,
+          },
+        });
+      }
+
+      const token = jwt.sign(
+        {
+          id: user.id,
+          roleId: user.roleId,
+        },
+        "secret_key",
+        {
+          expiresIn: "24h",
+        }
+      );
+
+      return res.status(200).json({
+        user,
+        token,
+      })
+
+    } catch (error) {
+      console.log(error);
       res.status(500).json({
         error: "Something went wrong",
       });
