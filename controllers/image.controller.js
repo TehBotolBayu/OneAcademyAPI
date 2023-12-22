@@ -96,8 +96,6 @@ module.exports = {
                         id: imageId
                     }
                 })
-                
-                
             }
 
             return res.status(201).json({

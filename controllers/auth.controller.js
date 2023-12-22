@@ -13,9 +13,10 @@ async function hashPassword(plaintextPassword) {
 const cryptPassword = async (password) => {
   const salt = await bcrypt.genSalt(5);
   const hash = await bcrypt.hash(password, salt);
-  const encrypted = hash.replace("/", "");
+  const encrypted = hash.replace(/\//g, '');
   return encrypted;
 };
+
 
 function generateOTP() {
   var digits = "0123456789";
@@ -516,6 +517,10 @@ module.exports = {
 
       const encrypt = await cryptPassword(req.body.email);
 
+      return res.status(200).json({
+        encrypt
+      })
+
       await Users.update({
         data: {
           resetToken: encrypt,
@@ -539,7 +544,6 @@ module.exports = {
         from: "system@gmail.com",
         to: req.body.email,
         subject: "Reset Password",
-        // html: `<p>Reset Password </p><a href="localhost:5000/set-password/${encrypt}">Click Here</a><br></br><p>Paste this url to your browser if you cant click link above</p><p>localhost:5000/set-password/${encrypt}</p>`,
         html: `<div
         style="
           text-align: center;
@@ -612,6 +616,7 @@ module.exports = {
 
         return res.status(200).json({
           message: "email sent",
+          encrypt
         });
       });
     } catch (error) {
@@ -653,6 +658,7 @@ module.exports = {
       console.log(error);
       return res.status(500).json({
         error: "Something went wrong",
+
       });
     }
   },
