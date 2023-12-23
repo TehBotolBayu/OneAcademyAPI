@@ -29,7 +29,7 @@ function generateOTP() {
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
-  "http://localhost:3000/api/v1/user/auth/google/callback",
+  // "http://localhost:3000/api/v1/user/auth/google/callback",
   "https://oneacademyapi-staging.up.railway.app/api/v1/user/auth/google"
 );
 
