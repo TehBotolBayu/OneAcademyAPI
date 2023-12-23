@@ -5,6 +5,7 @@ const {
   Chapters,
   Transactions,
   Categories,
+  Users
 } = require("../models");
 
 module.exports = {
@@ -251,6 +252,7 @@ module.exports = {
   getCourseById: async (req, res) => {
     try {
       const userId = res.locals.userId;
+  
       const course = await Courses.findUnique({
         where: {
           id: req.params.courseId,
@@ -273,41 +275,40 @@ module.exports = {
           },
         },
       });
-
+  
       if (!course) {
         return res.status(404).json({
-          message: "data not found",
+          message: "Data not found",
         });
       }
-
-      // Ambil data transaksi berdasarkan courseId dan userId
+  
       const transaction = await Transactions.findFirst({
         where: {
-          courseId: course.id,
-          userId: userId,
+          userId :res.locals.userId,
+          courseId: course.id
         },
       });
-
+  
       const chapters = await Chapters.findMany({
         where: {
           courseId: course.id,
         },
         include: {
           material: {
-            orderBy : {
-              step : "asc"
-            }
+            orderBy: {
+              step: "asc",
+            },
           },
         },
         orderBy: {
-          step : "asc"
-        }
+          step: "asc",
+        },
       });
-
-      return res.status(201).json({
+  
+      return res.status(200).json({
         course,
         chapters,
-        transaction,
+        transaction, // Menambahkan data transaksi pengguna yang sedang login
       });
     } catch (error) {
       console.log(error);

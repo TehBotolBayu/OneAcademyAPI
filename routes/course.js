@@ -15,7 +15,7 @@ router.put(
 );
 router.get("/filterSearch", courseController.filterAndSearch);
 router.get("/", courseController.getAllCourses);
-router.get("/:courseId" ,courseController.getCourseById);
+router.get("/:courseId" ,checkToken,courseController.getCourseById);
 router.delete("/:courseId", checkToken,  courseController.deleteCourse, imageController.deleteImage);
 
 // SEARCH
