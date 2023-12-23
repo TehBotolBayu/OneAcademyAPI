@@ -27,6 +27,7 @@ const checkToken = (req, res, next) => {
 
   try {
     const jwtPayLoad = jwt.verify(token, "secret_key");
+    console.log(jwtPayLoad);
     if (!jwtPayLoad) {
       return res.status(403).json({
         error: "unauthenticated",
