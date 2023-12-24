@@ -3,6 +3,7 @@ const ImageKit = require("imagekit");
 const formatDateTime = (dateInput) => {
   const date = new Date(dateInput);
   return date.toLocaleString("id-ID", {
+    timeZone: "Asia/Jakarta",
     hour12 :false
   })
 }

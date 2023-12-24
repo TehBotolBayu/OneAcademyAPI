@@ -71,7 +71,6 @@ module.exports = {
           success: true,
           message: "user class data successfully found",
           userClasses,
-          tes,
         });
       }
     } catch (error) {
