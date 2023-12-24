@@ -6,7 +6,7 @@ module.exports = {
         try {
             if(res.locals.roleId === 2){
                 return res.status(401).json({
-                  message: "Unauthorized"
+                  error: "Unauthorized"
                 })
             }
             
@@ -35,8 +35,8 @@ module.exports = {
             throw new Error("failed to upload image");
         } catch (error) {
             console.log(error.message);
-            return res.status(400).json({
-                error
+            return res.status(500).json({
+                error : "Something went wrong were trying to upload"
             })
         }
     },
@@ -53,8 +53,8 @@ module.exports = {
             next();   
         } catch (error) {
             console.log(error.message);
-            return res.status(400).json({
-                error
+            return res.status(500).json({
+                error : "Something went wrong"
             })           
         }
     },
@@ -98,13 +98,13 @@ module.exports = {
                 })
             }
 
-            return res.status(201).json({
+            return res.status(200).json({
               course
             });            
         } catch (error) {
             console.log(error.message);
-            return res.status(400).json({
-                error
+            return res.status(500).json({
+                error: "Something went wrong"
             })            
         }
     },
@@ -112,7 +112,6 @@ module.exports = {
     deleteImage: async (req, res, next) => {
         try {
             const {data, image} = res.locals.data;
-            // console.log(image);
             let deletedFile;
             if(image){
                 deletedFile = await imageKit.deleteFile(image.metadata.fileId, (err, res) => {
@@ -122,14 +121,14 @@ module.exports = {
                 })
             }
             
-            return res.status(400).json({
+            return res.status(204).json({
                 status: "deleted",
                 data: data,
                 metadata: deletedFile
             })
         } catch (error) {
-            return res.status(400).json({
-                error
+            return res.status(500).json({
+                error: "Something went wrong"
             })
         }
     }

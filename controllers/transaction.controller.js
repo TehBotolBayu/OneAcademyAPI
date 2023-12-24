@@ -1,4 +1,10 @@
-  const { Users, Transactions, Courses, Materials, Course_Progress } = require("../models");
+const {
+  Users,
+  Transactions,
+  Courses,
+  Materials,
+  Course_Progress,
+} = require("../models");
 const nodemailer = require("nodemailer");
 const { formatDateTime } = require("../utils");
 
@@ -26,7 +32,7 @@ module.exports = {
 
       if (!course) {
         return res.status(404).json({
-          message: "Course not found",
+          error: "Course not found",
         });
       }
 
@@ -39,7 +45,7 @@ module.exports = {
       });
 
       if (!existingTransaction) {
-        return res.status(404).json({ message: "Transaction not found!" });
+        return res.status(404).json({ error: "Transaction not found!" });
       }
 
       return res.status(200).json({
@@ -77,7 +83,7 @@ module.exports = {
 
       if (!course) {
         return res.status(404).json({
-          message: "Course not found",
+          error: "Course not found",
         });
       }
 
@@ -91,7 +97,7 @@ module.exports = {
 
       if (existingTransaction) {
         return res.status(400).json({
-          message: "You already have a transaction for this course!",
+          error: "You already have a transaction for this course!",
         });
       }
 
@@ -117,36 +123,34 @@ module.exports = {
 
         const materials = await Materials.findMany({
           where: {
-            courseId: course.id
-          }
-        })
+            courseId: course.id,
+          },
+        });
 
-        
         materials.forEach(async (e) => {
           let progress = await Course_Progress.create({
             data: {
               isCompleted: false,
               user: {
-                connect: {id: userId},
+                connect: { id: userId },
               },
               course: {
-                connect: {id: course.id},
+                connect: { id: course.id },
               },
               material: {
-                connect: {id: e.id}
-              }
-            }
+                connect: { id: e.id },
+              },
+            },
           });
         });
 
-        return res.json({ message: "Detail Transaction", transaction, course});
-      } 
-      else {
+        return res.json({ message: "Detail Transaction", transaction, course });
+      } else {
         return res.status(400).json({ error: "Course invalid" });
       }
     } catch (error) {
       console.log(error);
-      return res.status(500).json({ error: error.message });
+      return res.status(500).json({ error: "Something went wrong" });
     }
   },
 
@@ -176,36 +180,40 @@ module.exports = {
       });
 
       if (!transaction) {
-        return res.sendStatus(404);
+        return res.status(404).json({
+          error: "Transaction not found"
+        });
       }
 
       // Periksa apakah pengguna yang membeli course sesuai dengan pengguna yang terautentikasi
       const userId = res.locals.userId;
       if (transaction.user.id !== userId) {
-        return res.sendStatus(403);
+        return res.status(403).json({
+          error: "The user who purchased the course does not match the authenticated user"
+        });
       }
 
       // Periksa apakah courseType adalah "Premium"
       if (transaction.course.courseType === "Gratis") {
         if (paymentMethod) {
           return res.status(400).json({
-            message: "Payment method is not required for free courses",
+            error: "Payment method is not required for free courses",
           });
         }
       } else if (transaction.course.courseType === "Premium") {
         // Periksa metode pembayaran yang valid
         const validPaymentMethods = ["Credit Card", "Transfer Bank"];
         if (!validPaymentMethods.includes(paymentMethod)) {
-          return res.status(400).json({ message: "Invalid payment method" });
+          return res.status(400).json({ error: "Invalid payment method" });
         }
       } else {
-        return res.status(400).json({ message: "Invalid course type" });
+        return res.status(400).json({ error: "Invalid course type" });
       }
 
       if (transaction.status === "Sudah Bayar") {
-        return res
-          .status(403)
-          .json({ message: "You already pay this course!" });
+        return res.status(400).json({ 
+          error: "You already pay this course" 
+        });
       }
 
       // update status transaksi dan metode pembayaran
@@ -264,7 +272,9 @@ module.exports = {
           "
         >
           <p>
-            Hi <span style="font-weight: 700">${transaction.user.profile.name},</span> <br />
+            Hi <span style="font-weight: 700">${
+              transaction.user.profile.name
+            },</span> <br />
             Thanks for your purchase from OneAcademy.
           </p>
   
@@ -319,7 +329,9 @@ module.exports = {
       transporter.sendMail(mailOptions, (err) => {
         if (err) {
           console.log(err);
-          return res.status(400);
+          return res.status(400).json({
+            error: "Something went wrong were trying to send"
+          });
         }
         return res.status(200).json({
           message:
@@ -329,7 +341,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      return res.status(500).json({ error: error.message });
+      return res.status(500).json({ error: "Something went wrong" });
     }
   },
 
@@ -392,12 +404,12 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      return res.status(400).json({ error: error.message });
+      return res.status(400).json({ error: "Something went wrong" });
     }
   },
 
   deleteTransaction: async (req, res) => {
     await Transactions.deleteMany();
-    return res.status(200).json({})
-  }
+    return res.status(200).json({});
+  },
 };

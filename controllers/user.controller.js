@@ -128,7 +128,7 @@ module.exports = {
       const user = await services.getDetail(userId);
 
       if (!user) {
-        return res.status(404).json({ message: "Profile not found!" });
+        return res.status(404).json({ error: "Profile not found!" });
       }
 
       const userRes = views.userDetail(user);
@@ -146,7 +146,7 @@ module.exports = {
         const user = await services.findUserByEmail({ email });
 
         if (user.id !== userId && user.email === email) {
-          return res.status(400).json({ message: "email already used!" });
+          return res.status(400).json({ error: "email already used!" });
         }
       }
 
@@ -211,13 +211,13 @@ module.exports = {
 
       if (oldPassword === newPassword) {
         return res.status(400).json({
-          message: "The old password cannot be the same as the new password!",
+          error: "The old password cannot be the same as the new password!",
         });
       }
 
       if (!oldPassword || !newPassword) {
         return res.status(400).json({
-          message: "oldPassword, newPassword are required!",
+          error: "oldPassword, newPassword are required!",
         });
       }
 
@@ -225,7 +225,7 @@ module.exports = {
 
       if (!bcrypt.compareSync(oldPassword, user.password)) {
         return res.status(400).json({
-          message: "Old password not same!",
+          error: "Old password not same!",
         });
       }
       const hashed = await hashPassword(newPassword);
@@ -278,8 +278,8 @@ module.exports = {
       });
 
       if (transaction.length === 0) {
-        return res.json({
-          message: "You haven't purchased any courses yet",
+        return res.status(400).json({
+          error : "You haven't purchased any courses yet",
           transaction
         });
       } else {

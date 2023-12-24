@@ -157,7 +157,7 @@ module.exports = {
     try {
       if(res.locals.roleId !== 1){
         return res.status(401).json({
-          message: "Unauthorized"
+          error: "Unauthorized"
         })
       }
 
@@ -278,7 +278,7 @@ module.exports = {
   
       if (!course) {
         return res.status(404).json({
-          message: "Data not found",
+          error: "Data not found",
         });
       }
   
@@ -320,7 +320,7 @@ module.exports = {
     try {
       if(res.locals.roleId !== 1){
         return res.status(401).json({
-          message: "Unauthorized"
+          error: "Unauthorized"
         })
       }
       const course = await Courses.update({
@@ -344,14 +344,14 @@ module.exports = {
       next();
     } catch (error) {
       console.log(error);
-      return res.status(400).json({ error: error.message });
+      return res.status(500).json({ error: error.message });
     }
   },
   deleteCourse: async (req, res, next) => {
     try {
       if(res.locals.roleId !== 1){
         return res.status(401).json({
-          message: "Unauthorized"
+          error: "Unauthorized"
         })
       }
 

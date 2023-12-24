@@ -79,7 +79,7 @@ module.exports = {
 
       if (existUser) {
         return res.status(400).json({
-          message: "Email already registered",
+          error: "Email already registered",
         });
       }
 
@@ -191,7 +191,7 @@ module.exports = {
     } catch (error) {
       console.log(error.message);
       return res.status(500).json({
-        message: "Something went wrong",
+        error: "Something went wrong",
       });
     }
   },
@@ -227,8 +227,8 @@ module.exports = {
           });
         }
       } else {
-        return res.status(200).json({
-          message: "Your OTP is invalid",
+        return res.status(400).json({
+          error: "Your OTP is invalid",
         });
       }
     } catch (error) {
@@ -336,8 +336,8 @@ module.exports = {
       });
     } catch (error) {
       console.log(error.message);
-      return res.status(400).json({
-        error,
+      return res.status(500).json({
+        error : "Something went wrong"
       });
     }
   },
@@ -352,13 +352,13 @@ module.exports = {
 
       if (!findUser) {
         return res.status(404).json({
-          error: "Email tidak terdaftar!",
+          error: "Email not registered",
         });
       }
 
       if (findUser.status === "inactive") {
         return res.status(401).json({
-          message: "Account is not activated, please enter OTP",
+          error: "Account is not activated, please enter OTP",
         });
       }
 
@@ -382,7 +382,7 @@ module.exports = {
         });
       }
 
-      return res.status(403).json({
+      return res.status(400).json({
         error: "Invalid credentials",
       });
     } catch (error) {
@@ -410,8 +410,7 @@ module.exports = {
 
       if (!data.email || !data.name) {
         return res.status(400).json({
-          message: "Data not Found",
-          data: data,
+          error: "Data not Found",
         });
       }
 
@@ -472,7 +471,7 @@ module.exports = {
     const token = req.headers.authorization;
     try {
       if (!token) {
-        return res.status(403).json({
+        return res.status(400).json({
           error: "please provide a token",
         });
       }
@@ -509,15 +508,11 @@ module.exports = {
 
       if (!findUser) {
         return res.status(400).json({
-          message: "User not found",
+          error: "User not found",
         });
       }
 
       const encrypt = await cryptPassword(req.body.email);
-
-      // return res.status(200).json({
-      //   encrypt,
-      // });
 
       await Users.update({
         data: {
@@ -608,7 +603,7 @@ module.exports = {
         if (err) {
           console.log(err);
           return res.status(400).json({
-            message: "Something went wrong",
+            error: "Something went wrong",
           });
         }
 
@@ -635,7 +630,7 @@ module.exports = {
 
       if (!findUser) {
         return res.status(400).json({
-          message: "User not found",
+          error: "User not found",
         });
       }
 
