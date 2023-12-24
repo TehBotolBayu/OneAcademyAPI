@@ -5,7 +5,7 @@ module.exports = {
     try {
       if(res.locals.roleId !== 1){
         return res.status(401).json({
-          message: "Unauthorized"
+          error: "Unauthorized"
         })
       }
       const material = await Materials.create({
@@ -56,7 +56,7 @@ module.exports = {
     try {
       if(res.locals.roleId !== 1){
         return res.status(401).json({
-          message: "Unauthorized"
+          error: "Unauthorized"
         })
       }
       const material = await Materials.update({
@@ -84,7 +84,7 @@ module.exports = {
     try {
       if(res.locals.roleId !== 1){
         return res.status(401).json({
-          message: "Unauthorized"
+          error: "Unauthorized"
         })
       }
       const material = await Materials.delete({

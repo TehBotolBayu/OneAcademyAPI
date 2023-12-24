@@ -4,10 +4,10 @@ const { imageKit } = require("../utils");
 module.exports = {
   create: async (req, res) => {
     try {
-      if(res.locals.roleId !== 1){
+      if (res.locals.roleId !== 1) {
         return res.status(401).json({
-          message: "Unauthorized"
-        })
+          message: "Unauthorized",
+        });
       }
       const { name, image } = req.body;
 
@@ -42,7 +42,7 @@ module.exports = {
         category: category,
       });
     } catch (error) {
-      res.status(500).json({ error : "Something went wrong" });
+      res.status(500).json({ error: "Something went wrong" });
     }
   },
 
@@ -62,7 +62,9 @@ module.exports = {
 
       return res.status(200).json({ category });
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      res.status(500).json({
+        error: "Something went wrong",
+      });
     }
   },
 
@@ -70,32 +72,32 @@ module.exports = {
     try {
       const category = await Categories.findMany({
         include: {
-          image : {
-            select : {
-              url : true,
-            }
-          }
-        }
+          image: {
+            select: {
+              url: true,
+            },
+          },
+        },
       });
 
       if (Categories.length === 0) {
         return res.status(404).json({
-          message: "Category not found!",
+          error: "Category not found!",
         });
       }
 
       return res.status(200).json({ category });
     } catch (error) {
-      res.status(400).json({ error : "Something went wrong" });
+      res.status(500).json({ error: "Something went wrong" });
     }
   },
 
   update: async (req, res) => {
     try {
-      if(res.locals.roleId !== 1){
+      if (res.locals.roleId !== 1) {
         return res.status(401).json({
-          message: "Unauthorized"
-        })
+          error: "Unauthorized",
+        });
       }
       const id = req.params.id;
       const { name, image } = req.body;
@@ -106,7 +108,7 @@ module.exports = {
       });
 
       if (!findCategory) {
-        return res.status(404).json({ message: "Category not found!" });
+        return res.status(404).json({ error: "Category not found!" });
       }
 
       // Variabel untuk menyimpan hasil upload file jika ada
@@ -166,16 +168,16 @@ module.exports = {
         });
       }
     } catch (error) {
-      res.status(400).json({ error : "Something went wrong" });
+      res.status(500).json({ error: "Something went wrong" });
     }
   },
 
   destroy: async (req, res) => {
     try {
-      if(res.locals.roleId !== 1){
+      if (res.locals.roleId !== 1) {
         return res.status(401).json({
-          message: "Unauthorized"
-        })
+          error: "Unauthorized",
+        });
       }
       const id = req.params.id;
 
@@ -189,7 +191,7 @@ module.exports = {
       });
 
       if (!findCategory) {
-        return res.status(404).json({ message: "Category not found!" });
+        return res.status(404).json({ error: "Category not found!" });
       }
 
       // Menghapus data gambar dari tabel "images"
@@ -211,7 +213,7 @@ module.exports = {
         message: "Delete successfully",
       });
     } catch (error) {
-      res.status(400).json({ error : "Something went wrong" });
+      res.status(500).json({ error: "Something went wrong" });
     }
   },
 };

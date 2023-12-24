@@ -5,7 +5,7 @@ module.exports = {
     try {
       if(res.locals.roleId !== 1){
         return res.status(401).json({
-          message: "Unauthorized"
+          error: "Unauthorized"
         })
       }
       const chapter = await Chapters.create({
@@ -23,7 +23,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      return res.status(400).json({ error : "Something went wrong" });
+      return res.status(500).json({ error : "Something went wrong" });
     }
   },
 
@@ -44,7 +44,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      return res.status(400).json({ error : "Something went wrong" });
+      return res.status(500).json({ error : "Something went wrong" });
     }
   },
 
@@ -52,7 +52,7 @@ module.exports = {
     try {
       if(res.locals.roleId !== 1){
         return res.status(401).json({
-          message: "Unauthorized"
+          error: "Unauthorized"
         })
       }
       const chapter = await Chapters.update({
@@ -71,7 +71,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      return res.status(400).json({ error : "Something went wrong" });
+      return res.status(500).json({ error : "Something went wrong" });
     }
   },
 
@@ -79,7 +79,7 @@ module.exports = {
     try {
       if(res.locals.roleId !== 1){
         return res.status(401).json({
-          message: "Unauthorized"
+          error: "Unauthorized"
         })
       }
       const chapter = await Chapters.delete({
@@ -92,7 +92,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      return res.status(400).json({ error : "Something went wrong" });
+      return res.status(500).json({ error : "Something went wrong" });
     }
   },
 };
