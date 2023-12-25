@@ -10,132 +10,152 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Rolename{
+enum Rolename {
   ADMIN
   USER
 }
 
-model Roles{
-  id Int @id @default(autoincrement())
+model Roles {
+  id   Int      @id @default(autoincrement())
   name Rolename
-  user Users?
+  user Users[]
 }
 
-model Users{
-  id String @id @default(uuid())
-  email String
-  phone String
-  password String
-  resetToken String
-  codeOTP Int
-  OTPlimit DateTime @default(now())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  roleId Int? @unique
-  role Roles? @relation(fields: [roleId], references: [id], onDelete: SetNull)
-
-  profile Profiles?
+model Users {
+  id          String         @id @default(uuid())
+  email       String  @unique
+  phone       String
+  password    String
+  status      String
+  resetToken  String?
+  codeOTP     String?
+  OTPlimit    DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  course_progress Course_Progress[]
+  roleId      Int?
+  role        Roles?         @relation(fields: [roleId], references: [id], onDelete: SetNull)
+  profile     Profiles?
   transaction Transactions[]
-  review Reviews[]
+  review      Reviews[]
 }
 
-model Profiles{
-  id String @id @default(uuid())
-  name String
-  country String
-  city String
+model Profiles {
+  id        String   @id @default(uuid())
+  name      String
+  country   String?
+  city      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  userId String @unique
-  imageId String? @unique
-  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
-  image Images? @relation(fields: [imageId], references: [id], onDelete: SetNull)
+  userId    String   @unique
+  imageId   String?  @unique
+  user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  image     Images?  @relation(fields: [imageId], references: [id], onDelete: SetNull)
 }
 
-model Transactions{
-  id String @id @default(uuid())
-  status String
-  paymentMethod String
-  totalTax Float
-  totalPrice Float
-  paymentDate DateTime 
-
-  userId String?
-  courseId String? @unique
-  user Users? @relation(fields: [userId], references: [id], onDelete: SetNull)
-  course Courses? @relation(fields: [courseId], references: [id], onDelete: SetNull)
+model Transactions {
+  id            String   @id @default(uuid())
+  status        String
+  paymentMethod String?
+  totalTax      Float
+  totalPrice    Float
+  paymentDate   DateTime
+  userId        String?
+  courseId      String?
+  user          Users?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  course        Courses? @relation(fields: [courseId], references: [id], onDelete: SetNull)
 }
 
-model Reviews{
-  id String @id @default(uuid())
-  score Float
-  comment String
+model Reviews {
+  id        String   @id @default(uuid())
+  score     Float
+  comment   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  userId String @unique
-  courseId String @unique
-  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course Courses @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  userId    String   @unique
+  courseId  String   @unique
+  user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course    Courses  @relation(fields: [courseId], references: [id], onDelete: Cascade)
 }
 
-model Categories{
-  id String @id @default(uuid())
-  name String
+model Categories {
+  id        String   @id @default(uuid())
+  name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  imageId String? @unique
-  image Images? @relation(fields: [imageId], references: [id], onDelete: SetNull)
-
+  imageId   String?  @unique
+  image     Images?  @relation(fields: [imageId], references: [id], onDelete: SetNull)
   course Courses[]
 }
 
-model Courses{
-  id String @id @default(uuid())
-  title String
-  instructor String
-  courseType String
-  level String
-  price Float
+model Courses {
+  id          String        @id @default(uuid())
+  title       String
+  instructor  String
+  courseType  String
+  level       String
+  price       Float
   description String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  imageId String? @unique
-  categoryId String?
-  image Images? @relation(fields: [imageId], references: [id], onDelete: SetNull)
-  category Categories? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-
-  material Materials[]
-  transaction Transactions?
-  review Reviews[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  imageId     String?       @unique
+  categoryId  String?
+  image       Images?       @relation(fields: [imageId], references: [id], onDelete: SetNull)
+  category    Categories?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  transaction Transactions[]
+  material Materials[] 
+  review      Reviews[]
+  chapter    Chapters[]
+  course_progress Course_Progress[]
 }
 
-model Materials{
-  id String @id @default(uuid())
-  title String
-  videoURL String
-  duration String
-  status String
+model Materials {
+  id        String   @id @default(uuid())
+  step      Int
+  title     String
+  videoURL  String
+  duration  Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   courseId String
-  course Courses @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  chapterId String
+  course_progress Course_Progress[]
+  course Courses @relation(fields: [courseId], references: [id] ,onDelete: Cascade)
+  chapter   Chapters @relation(fields: [chapterId], references: [id], onDelete: Cascade)
 }
 
-model Images{
-  id String @id @default(uuid())
-  url String
-  title String
-  metadata Json
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Chapters {
+  id            String      @id @default(uuid())
+  totalDuration Int
+  step          Int
+  title         String
+  courseId      String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  material      Materials[]
+  course        Courses     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+}
 
-  course Courses?
-  profile Profiles?
-  category Categories?
+model Images {
+  id        String      @id @default(uuid())
+  url       String
+  title     String
+  metadata  Json
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  course    Courses?
+  profile   Profiles?
+  category  Categories?
+}
+
+model Course_Progress {
+  userId String
+  courseId String
+  materialId String
+  isCompleted Boolean
+  @@id([userId, materialId])
+
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course        Courses     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  material        Materials     @relation(fields: [materialId], references: [id], onDelete: Cascade)
 }
