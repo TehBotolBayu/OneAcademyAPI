@@ -96,6 +96,12 @@ module.exports = {
         },
       });
 
+      if(!progress.userId_materialId){
+        return res.status(404).json({
+          error: "Data not found"
+        })
+      }
+
       return res.status(200).json({
         progress,
       });
