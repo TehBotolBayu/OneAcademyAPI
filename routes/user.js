@@ -3,25 +3,15 @@ const express = require("express"),
   controller = require("../controllers/auth.controller.js"),
   userController = require("../controllers/user.controller.js"),
   multerLib = require("multer")(),
-  auth = require("../middlewares/auth.js"),
-  {oauth2Client,scopes} = require('../controllers/auth.controller.js');
-require("dotenv").config();
+  auth = require("../middlewares/auth.js");
+  // {oauth2Client,scopes} = require('../controllers/auth.controller.js');
 
 
 
 //Authentication
 router.post("/register", controller.register);
 router.post("/login", controller.login);
-router.get('/auth/google', (req, res) => {
-  const authorizationUrl = oauth2Client.generateAuthUrl({
-    access_type: "offline",
-    scope: scopes,
-    include_granted_scopes: true,
-  });
-  
-  res.redirect(authorizationUrl);
-});
-router.get("/auth/google/callback", controller.loginGoogle); 
+router.post('/auth/google',controller.loginGoogle); 
 router.post("/logout",auth.checkToken, controller.logout); 
 router.post("/verify", controller.verifyOTP);
 router.post("/resetOTP", controller.resetOTP);
