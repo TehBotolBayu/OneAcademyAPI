@@ -397,13 +397,7 @@ module.exports = {
         { httpsAgent: agent }
       );
 
-      if (!data.email || !data.name) {
-        return res.status(400).json({
-          error: "Data not Found",
-        });
-      }
-
-      const user = await Users.findUnique({
+      const user = await Users.findFirst({
         where: {
           email: data.email,
         },
