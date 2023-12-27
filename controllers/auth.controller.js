@@ -3,7 +3,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const { revokeToken } = require("../middlewares/auth");
-const { google } = require("googleapis");
 const axios = require("axios");
 const https = require("https");
 
@@ -32,19 +31,7 @@ const agent = new https.Agent({
   rejectUnauthorized: false,
 });
 
-const oauth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET
-);
-
-const scopes = [
-  "https://www.googleapis.com/auth/userinfo.email",
-  "https://www.googleapis.com/auth/userinfo.profile",
-];
-
 module.exports = {
-  oauth2Client,
-  scopes,
   getAllRole: async (req, res) => {
     try {
       const roles = await Roles.findMany();
@@ -405,24 +392,10 @@ module.exports = {
         return res.status(400).json({ error: "Access Token is required" });
       }
 
-      // const { code } = req.query;
-
-      // const { tokens } = await oauth2Client.getToken(code);
-
-      const response = await axios.get(
+      const data = await axios.get(
         `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${access_token}`,
         { httpsAgent: agent }
       );
-      const { email, name } = response.data;
-
-      // oauth2Client.setCredentials(tokens);
-
-      // const oauth2 = google.oauth2({
-      //   auth: oauth2Client,
-      //   version: "v2",
-      // });
-
-      // const { data } = await oauth2.userinfo.get();
 
       if (!data.email || !data.name) {
         return res.status(400).json({
@@ -432,7 +405,7 @@ module.exports = {
 
       const user = await Users.findUnique({
         where: {
-          email: email,
+          email: data.email,
         },
         include: {
           profile: true,
@@ -443,13 +416,13 @@ module.exports = {
       if (!user) {
         let user = await Users.create({
           data: {
-            email,
+            email : data.email,
             password: "",
             status: "active",
             phone: "",
             profile: {
               create: {
-                name,
+                name: data.name,
               },
             },
             roleId: 2,
