@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const { revokeToken } = require("../middlewares/auth");
 const { google } = require("googleapis");
+const axios = require("axios");
 
 async function hashPassword(plaintextPassword) {
   const hash = await bcrypt.hash(plaintextPassword, 10);
@@ -28,7 +29,7 @@ function generateOTP() {
 
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
+  process.env.GOOGLE_CLIENT_SECRET
 );
 
 const scopes = [
@@ -335,7 +336,7 @@ module.exports = {
     } catch (error) {
       console.log(error.message);
       return res.status(500).json({
-        error : "Something went wrong"
+        error: "Something went wrong",
       });
     }
   },
@@ -393,18 +394,30 @@ module.exports = {
 
   loginGoogle: async (req, res) => {
     try {
-      const { code } = req.query;
+      const { access_token } = req.body;
 
-      const { tokens } = await oauth2Client.getToken(code);
+      if (!access_token) {
+        return res.status(400).json({ error: "Access Token is required" });
+      }
 
-      oauth2Client.setCredentials(tokens);
+      // const { code } = req.query;
 
-      const oauth2 = google.oauth2({
-        auth: oauth2Client,
-        version: "v2",
-      });
+      // const { tokens } = await oauth2Client.getToken(code);
 
-      const { data } = await oauth2.userinfo.get();
+      const response = await axios.get(
+        `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${access_token}`,
+        { httpsAgent: agent }
+      );
+      const { email, name } = response.data;
+
+      // oauth2Client.setCredentials(tokens);
+
+      // const oauth2 = google.oauth2({
+      //   auth: oauth2Client,
+      //   version: "v2",
+      // });
+
+      // const { data } = await oauth2.userinfo.get();
 
       if (!data.email || !data.name) {
         return res.status(400).json({
@@ -414,7 +427,7 @@ module.exports = {
 
       const user = await Users.findUnique({
         where: {
-          email: data.email,
+          email : email,
         },
         include: {
           profile: true,
@@ -425,13 +438,13 @@ module.exports = {
       if (!user) {
         let user = await Users.create({
           data: {
-            email: data.email,
+            email,
             password: "",
             status: "active",
             phone: "",
             profile: {
               create: {
-                name: data.name,
+                name,
               },
             },
             roleId: 2,
