@@ -5,6 +5,7 @@ const nodemailer = require("nodemailer");
 const { revokeToken } = require("../middlewares/auth");
 const { google } = require("googleapis");
 const axios = require("axios");
+const https = require("https");
 
 async function hashPassword(plaintextPassword) {
   const hash = await bcrypt.hash(plaintextPassword, 10);
