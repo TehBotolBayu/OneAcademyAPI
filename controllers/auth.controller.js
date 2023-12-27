@@ -394,18 +394,23 @@ module.exports = {
 
       const data = await axios.get(
         `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${access_token}`,
-        { httpsAgent: agent }
+        { httpsAgent: agent },
       );
 
-      const user = await Users.findFirst({
-        where: {
-          email: data.email,
+      console.log(data);
+
+      // Validasi apakah user telah membuat akun
+      let user = await Users.findFirst({
+        where : {
+          email : data.email,
         },
-        include: {
+        include : {
           profile: true,
-          role: true,
-        },
-      });
+          role : true
+        }
+      })
+
+      console.log(user)
 
       if (!user) {
         let user = await Users.create({
