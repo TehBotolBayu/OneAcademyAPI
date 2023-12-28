@@ -408,6 +408,7 @@ module.exports = {
         }
       })
 
+      // Jika user belum memiliki akun pada email tersebut
       if (!user) {
          user = await Users.create({
           data: {
@@ -428,6 +429,8 @@ module.exports = {
         });
       }
 
+      const { password, ...userWithoutPassword } = user;
+
       const token = jwt.sign(
         {
           id: user.id,
@@ -440,7 +443,7 @@ module.exports = {
       );
 
       return res.status(200).json({
-        user,
+        user: userWithoutPassword,
         token,
       });
     } catch (error) {
