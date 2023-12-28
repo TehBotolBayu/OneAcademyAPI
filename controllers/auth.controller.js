@@ -3,7 +3,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const { revokeToken } = require("../middlewares/auth");
-const { google } = require("googleapis");
+const axios = require("axios");
+const https = require("https");
 
 async function hashPassword(plaintextPassword) {
   const hash = await bcrypt.hash(plaintextPassword, 10);
@@ -26,21 +27,11 @@ function generateOTP() {
   return OTP;
 }
 
-const oauth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  // "http://localhost:3000/api/v1/user/auth/google/callback",
-  "https://oneacademyapi-staging.up.railway.app/api/v1/user/auth/google/callback"
-);
-
-const scopes = [
-  "https://www.googleapis.com/auth/userinfo.email",
-  "https://www.googleapis.com/auth/userinfo.profile",
-];
+const agent = new https.Agent({
+  rejectUnauthorized: false,
+});
 
 module.exports = {
-  oauth2Client,
-  scopes,
   getAllRole: async (req, res) => {
     try {
       const roles = await Roles.findMany();
@@ -337,7 +328,7 @@ module.exports = {
     } catch (error) {
       console.log(error.message);
       return res.status(500).json({
-        error : "Something went wrong"
+        error: "Something went wrong",
       });
     }
   },
@@ -395,39 +386,33 @@ module.exports = {
 
   loginGoogle: async (req, res) => {
     try {
-      const { code } = req.query;
+      const { access_token } = req.body;
 
-      const { tokens } = await oauth2Client.getToken(code);
-
-      oauth2Client.setCredentials(tokens);
-
-      const oauth2 = google.oauth2({
-        auth: oauth2Client,
-        version: "v2",
-      });
-
-      const { data } = await oauth2.userinfo.get();
-
-      if (!data.email || !data.name) {
-        return res.status(400).json({
-          error: "Data not Found",
-        });
+      if (!access_token) {
+        return res.status(400).json({ error: "Access Token is required" });
       }
 
-      const user = await Users.findUnique({
-        where: {
-          email: data.email,
-        },
-        include: {
-          profile: true,
-          role: true,
-        },
-      });
+      const {data} = await axios.get(
+        `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${access_token}`,
+        { httpsAgent: agent },
+      );
 
+      // Validasi apakah user telah membuat akun
+      let user = await Users.findFirst({
+        where : {
+          email : data.email,
+        },
+        include : {
+          profile: true,
+          role : true
+        }
+      })
+
+      // Jika user belum memiliki akun pada email tersebut
       if (!user) {
-        let user = await Users.create({
+         user = await Users.create({
           data: {
-            email: data.email,
+            email : data.email,
             password: "",
             status: "active",
             phone: "",
@@ -444,6 +429,8 @@ module.exports = {
         });
       }
 
+      const { password, ...userWithoutPassword } = user;
+
       const token = jwt.sign(
         {
           id: user.id,
@@ -456,7 +443,7 @@ module.exports = {
       );
 
       return res.status(200).json({
-        user,
+        user: userWithoutPassword,
         token,
       });
     } catch (error) {
