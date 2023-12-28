@@ -392,12 +392,10 @@ module.exports = {
         return res.status(400).json({ error: "Access Token is required" });
       }
 
-      const data = await axios.get(
+      const {data} = await axios.get(
         `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${access_token}`,
         { httpsAgent: agent },
       );
-
-      console.log(data);
 
       // Validasi apakah user telah membuat akun
       let user = await Users.findFirst({
@@ -410,10 +408,8 @@ module.exports = {
         }
       })
 
-      console.log(user)
-
       if (!user) {
-        let user = await Users.create({
+         user = await Users.create({
           data: {
             email : data.email,
             password: "",
