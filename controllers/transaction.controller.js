@@ -227,6 +227,14 @@ module.exports = {
         },
       });
 
+      // Hapus response password
+      const { password, ...userWithoutPassword } = transaction.user;
+
+      const sanitizedTransaction = {
+        ...updatedTransaction,
+        user: userWithoutPassword,
+      };
+
       // Kirim E-Receipt ke email user
       const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
@@ -336,7 +344,7 @@ module.exports = {
         return res.status(200).json({
           message:
             "Transaction Success, We have sent a E-Receipt in your email.",
-          transaction: updatedTransaction,
+          transaction: sanitizedTransaction,
         });
       });
     } catch (error) {
