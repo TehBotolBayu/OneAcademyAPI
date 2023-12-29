@@ -101,6 +101,9 @@ module.exports = {
         },
       });
 
+      const { password, ...userWithoutPassword } = user;
+
+
       const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
         port: 465,
@@ -176,7 +179,7 @@ module.exports = {
         }
         return res.status(201).json({
           message: "account is created, OTP sent",
-          user,
+          user : userWithoutPassword,
         });
       });
     } catch (error) {
