@@ -67,6 +67,3 @@ List of Environment Variables :
 6. EMAIL_USER= Email to connect with nodemailer (send email)
 7. EMAIL_PASSWORD= Password application to connect a nodmailer (send email)  
 
-
-## ERD
-![App Screenshot](https://ik.imagekit.io/uy6buvfss/ERD-OneAcademy-ERD.png?updatedAt=1703929146993)
