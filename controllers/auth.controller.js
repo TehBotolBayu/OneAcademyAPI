@@ -598,8 +598,7 @@ module.exports = {
         }
 
         return res.status(200).json({
-          message: "email sent",
-          encrypt,
+          message: "email sent"
         });
       });
     } catch (error) {
