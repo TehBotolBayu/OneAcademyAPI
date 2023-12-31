@@ -3,6 +3,9 @@
 # One Academy API
 ### Final Project Kelompok 1 Binar Academy
 OneAcademy is an application providing online learning content in the form of videos. The platform offers accessible learning content either for free or through a subscription model. There are two user roles : admin and regular user. The admin role involves determining which courses will be available. On the other hand, users can access learning videos after making payments.
+
+![App Screenshot](https://ik.imagekit.io/uy6buvfss/WhatsApp%20Image%202023-12-31%20at%2010.36.59.jpeg?updatedAt=1703993848794)
+
 ## Features
 
 ## 1. Admin
