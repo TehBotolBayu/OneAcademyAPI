@@ -564,7 +564,7 @@ module.exports = {
           </p>
   
           <a
-            href="https://oneacademy-staging.pemudasukses.tech/forgot/${encrypt}"
+            href="https://oneacademy.pemudasukses.tech/forgot/${encrypt}"
             style="
               background-color: #6148ff;
               color: white;
