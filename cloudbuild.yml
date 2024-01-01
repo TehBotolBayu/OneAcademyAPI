@@ -1,0 +1,9 @@
+steps:
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: Update staging server
+  entrypoint: /bin/sh
+  args:
+  - '-c'
+  - |
+    set -x && \
+    gcloud compute ssh instance-2 --zone=us-central1-a --command='/bin/sh /home/bayuuabdur2903/pull.sh'
