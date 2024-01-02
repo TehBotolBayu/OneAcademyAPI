@@ -5,5 +5,5 @@ steps:
   args:
   - '-c'
   - |
-    gcloud projects add-iam-policy-binding binaracademy-408514 --member=user:bayuuabdur2903@gmail.com --role=roles/compute.viewer && \
-    set -x && gcloud compute ssh instance-2 --zone=us-central1-a --command='/bin/sh /home/bayuuabdur2903/pull.sh'
+    set -x && \
+    gcloud compute ssh instance-2 --zone=us-central1-a --command='/bin/sh /home/bayuuabdur2903/pull.sh'
